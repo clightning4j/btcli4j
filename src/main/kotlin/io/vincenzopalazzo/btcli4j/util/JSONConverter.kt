@@ -5,25 +5,20 @@ import java.lang.reflect.Type
 
 object JSONConverter {
 
-    private const val patternFormat = "dd-MM-yyyy HH:mm:ss"
-
     private val gsonBuilder = GsonBuilder()
+    private val gson = gsonBuilder.create()
 
     init {
         gsonBuilder.setPrettyPrinting()
-        gsonBuilder.setDateFormat(patternFormat)
     }
 
     fun serialize(obj: Any): String? {
-        val gson = gsonBuilder.create()
         return gson.toJson(obj)
     }
 
     fun <T> deserialize(fromString: String, responseType: Type): T {
-        require(!(fromString == null || fromString.isEmpty())) { "String parameter null or empty" }
-        return try {
-            val gson = gsonBuilder.create()
-            gson.fromJson(fromString, responseType)
+         try {
+             return gson.fromJson(fromString, responseType)
         } catch (ex: Exception) {
             ex.printStackTrace()
             throw RuntimeException(ex.cause)
