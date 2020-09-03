@@ -5,6 +5,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import okio.ByteString
 
 object HttpRequestFactory {
 
@@ -21,8 +22,8 @@ object HttpRequestFactory {
         return null
     }
 
-    fun execRequest(request: Request): ByteArray{
-        return client.newCall(request).execute().body!!.bytes()
+    fun execRequest(request: Request): ByteString{
+        return client.newCall(request).execute().body!!.byteString()
     }
 
     private fun buildPostRequest(url: String, body: String, mediaType: MediaType): Request {

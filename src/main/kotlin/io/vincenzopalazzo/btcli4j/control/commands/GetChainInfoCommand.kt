@@ -4,7 +4,6 @@ import io.vincenzopalazzo.btcli4j.util.HttpRequestFactory
 import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.log.CLightningLevelLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
-import java.nio.charset.StandardCharsets
 
 //TODO here I inject the configuration inside the request json objetc and I can know all from the configuration
 //This could be a JRPCLightning feature
@@ -12,11 +11,9 @@ class GetChainInfoCommand: ICommand {
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
         val network = "testnet/api"
         val reqGenesisBlock = HttpRequestFactory.createRequest("%s/block-height/0".format(network))
-        var genesisBlock = ""
+        val genesisBlock: String
         if(reqGenesisBlock != null){
-            // val result = String(resEstimateFee, StandardCharsets.UTF_8)
-            val res = HttpRequestFactory.execRequest(reqGenesisBlock!!)
-             genesisBlock = String(res, StandardCharsets.UTF_8)
+            genesisBlock = HttpRequestFactory.execRequest(reqGenesisBlock).utf8()
             plugin.log(CLightningLevelLog.DEBUG, "Genesis block %s".format(genesisBlock))
         }else{
             plugin.log(CLightningLevelLog.WARNING, "Request for genesis block null!!!")
@@ -24,13 +21,13 @@ class GetChainInfoCommand: ICommand {
         }
 
         val reqBlockchainHeight = HttpRequestFactory.createRequest("%s/blocks/tip/height".format(network))
-        var blockCount = 0
+        val blockCount: Int
         if(reqBlockchainHeight != null){
-            val res = HttpRequestFactory.execRequest(reqBlockchainHeight!!)
-            blockCount = String(res, StandardCharsets.UTF_8).toInt()
+            blockCount = HttpRequestFactory.execRequest(reqBlockchainHeight).utf8().toInt()
             plugin.log(CLightningLevelLog.DEBUG, "Block count = %s".format(blockCount.toString()))
         }else{
             plugin.log(CLightningLevelLog.WARNING, "Request to Block count null!!!")
+            return
         }
 
         //TODO add support to elements
@@ -47,6 +44,7 @@ class GetChainInfoCommand: ICommand {
             add("blockcount", blockCount)
             add("ibd", false)
         }
+
         plugin.log(CLightningLevelLog.DEBUG, response)
     }
 }

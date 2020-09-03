@@ -1,9 +1,6 @@
 package io.vincenzopalazzo.btcli4j.control
 
-import io.vincenzopalazzo.btcli4j.control.commands.EstimateFeeCommand
-import io.vincenzopalazzo.btcli4j.control.commands.GetChainInfoCommand
-import io.vincenzopalazzo.btcli4j.control.commands.GetRawBlockByHeightCommand
-import io.vincenzopalazzo.btcli4j.control.commands.ICommand
+import io.vincenzopalazzo.btcli4j.control.commands.*
 import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.log.CLightningLevelLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
@@ -18,6 +15,8 @@ object MediationMethod {
             put("getchaininfo", GetChainInfoCommand())
             put("estimatefees", EstimateFeeCommand())
             put("getrawblockbyheight", GetRawBlockByHeightCommand())
+            put("getutxout", GetUtxOutCommand())
+            put("sendrawtransaction", SendRawTransactionCommand())
         }
     }
 

@@ -6,11 +6,13 @@ import java.lang.reflect.Type
 object JSONConverter {
 
     private val gsonBuilder = GsonBuilder()
-    private val gson = gsonBuilder.create()
 
     init {
         gsonBuilder.setPrettyPrinting()
     }
+
+    private val gson = gsonBuilder.create()
+
 
     fun serialize(obj: Any): String? {
         return gson.toJson(obj)
