@@ -19,8 +19,11 @@
 package io.vincenzopalazzo.btcli4j
 
 import io.vincenzopalazzo.btcli4j.control.MediationMethod
+import io.vincenzopalazzo.btcli4j.util.HttpRequestFactory
+import jrpc.clightning.annotation.PluginOption
 import jrpc.clightning.annotation.RPCMethod
 import jrpc.clightning.plugins.CLightningPlugin
+import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 
 /**
@@ -28,8 +31,35 @@ import jrpc.service.converters.jsonwrapper.CLightningJsonObject
  */
 class Plugin: CLightningPlugin(){
 
+    @PluginOption(
+            name = "btcli4j-network",
+            description = "This option give information on the network",
+            defValue = "testnet",
+            typeValue = "string"
+    )
+    private var network: String = "testnet"
+
+    @PluginOption(
+            name = "btcli4j-proxy",
+            description = "This option give information on proxy enabled, by default set on tor proxy",
+            defValue = "127.0.0.1:9050",
+            typeValue = "string"
+    )
+    private var proxy: String = "127.0.0.1:9050"
+
+    @PluginOption(
+            name = "btcli4j-proxy-enable",
+            description = "This option give enable the proxy inside plugin. By default is true",
+            defValue = "true",
+            typeValue = "flag"
+    )
+    private var proxyEnable: Boolean = true
+
+    private val pluginInit = false
+
     @RPCMethod(name = "getchaininfo", description = "getchaininfo to fetch the data from blockstream.info")
     fun getChainInfo(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject){
+        this.configurePluginInit(plugin)
         MediationMethod.runCommand("getchaininfo", plugin, CLightningJsonObject(request["params"].asJsonObject), response)
     }
 
@@ -51,5 +81,18 @@ class Plugin: CLightningPlugin(){
     @RPCMethod(name = "sendrawtransaction", description = "sendrawtransaction to publish a new transaction with blockstream.info")
     fun sendRawTransaction(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject){
         MediationMethod.runCommand("sendrawtransaction", plugin, CLightningJsonObject(request["params"].asJsonObject), response)
+    }
+
+    private fun configurePluginInit(plugin: CLightningPlugin){
+        if(!pluginInit){
+            this.network = plugin.getParameter("btcli4j-network")
+            this.proxy = plugin.getParameter("btcli4j-proxy")
+            this.proxyEnable = plugin.getParameter("btcli4j-proxy-enable")
+            log(PluginLog.WARNING, "proxy enable: $proxyEnable")
+            if(proxyEnable){
+                HttpRequestFactory.configureProxy(this.proxy, true)
+                log(PluginLog.INFO, "Tor proxy enabled on btcli4j")
+            }
+        }
     }
 }

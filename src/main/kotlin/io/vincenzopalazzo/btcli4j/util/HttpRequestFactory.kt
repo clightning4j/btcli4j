@@ -22,7 +22,10 @@ import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okio.ByteString
 import okio.IOException
+import java.net.InetSocketAddress
+import java.net.Proxy
 import java.util.concurrent.TimeUnit
+
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -30,15 +33,47 @@ import java.util.concurrent.TimeUnit
 object HttpRequestFactory {
 
     private const val BASE_URL = "https://blockstream.info"
+    private const val BASE_URL_TORV3 = "http://explorerzydxu5ecjrkwceayqybizmpjjznk5izmitf2modhcusuqlid.onion"
+    private const val BASE_URL_TORV2 = "http://explorernuoc63nb.onion"
     private const val RETRY_TIME: Long = 60000
 
-    private val client = OkHttpClient.Builder()
-            .connectTimeout(15, TimeUnit.SECONDS)
-            .readTimeout(15, TimeUnit.SECONDS)
+    private var proxyEnabled: Boolean = false
+    private var client = OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
             .build()
 
-    fun createRequest(url: String, type: String = "get", body: String = "", mediaType: MediaType = "application/json; charset=utf-8".toMediaType()): Request?{
-        val completeUrl = "%s/%s".format(BASE_URL, url)
+    fun configureProxy(proxyString: String, tor: Boolean = true){
+        val tokens = proxyString.split(":")
+        val ip = tokens[0]
+        val port = tokens[1]
+        val proxyAddr = InetSocketAddress(ip, port.toInt())
+        if(tor){
+            val proxyTor = Proxy(Proxy.Type.SOCKS, proxyAddr)
+            client = OkHttpClient.Builder()
+                        .proxy(proxyTor)
+                        .connectTimeout(30, TimeUnit.SECONDS)
+                        .readTimeout(30, TimeUnit.SECONDS)
+                        .build()
+            proxyEnabled = true
+        }
+    }
+
+    fun createRequest(url: String, type: String = "get", body: String = "",
+                      mediaType: MediaType = "application/json; charset=utf-8".toMediaType(),
+                      torVersion: Int = 3
+    ): Request?{
+        val baseUrl: String
+        if(proxyEnabled){
+            if(torVersion == 3){
+                baseUrl = BASE_URL_TORV3
+            }else{
+                baseUrl = BASE_URL_TORV2
+            }
+        }else{
+            baseUrl = BASE_URL
+        }
+        val completeUrl = "%s/%s".format(baseUrl, url)
         when(type){
             "get" -> return buildGetRequest(completeUrl)
             "post" -> return buildPostRequest(completeUrl, body, mediaType)

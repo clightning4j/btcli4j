@@ -37,6 +37,19 @@ The contains only the command to run the jar with java, in my cases the script c
 In this case, you can move this bash script inside your `./lightning/plugins` the directory or you can add the plugin to the file conf
 with `plugin=/PATH/bash/file` or use the command line `--plugin=/path/bash/file`.
 
+## Plugin parameter
+
+- btcli4j-network: Indicate the network, by default is testnet, the value accepted are bitcoin, testnet, liquid.
+- btcli4j-proxy: Indicate the proxy address, by default is: "127.0.0.1:9050".
+- btcli4j-proxy-enable: A flag option, it help the user to enable the tor socket, by default is disabled.
+
+An complete example is
+```bash
+lightningd --btcli4j-proxy-enable --btcli4j-network=liquid
+```
+
+The command above, run the lightningd with torv3 on liquid network with esplora backend
+
 ## Built with
 
 - [JRPClightning](https://github.com/vincenzopalazzo/JRPClightning)

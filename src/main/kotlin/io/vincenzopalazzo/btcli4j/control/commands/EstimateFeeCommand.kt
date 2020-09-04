@@ -33,7 +33,12 @@ import java.io.IOException
 class EstimateFeeCommand : ICommand {
 
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
-        val network = "testnet/api"
+        val network: String
+        if(plugin.getParameter<String>("btcli4j-network") == "bitcoin"){
+            network = "api"
+        }else{
+            network = "${plugin.getParameter<String>("btcli4j-network")}/api"
+        }
 
         try {
             val reqEstimateFee = HttpRequestFactory.createRequest("%s/fee-estimates".format(network))!!

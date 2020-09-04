@@ -31,7 +31,12 @@ import okio.IOException
  */
 class SendRawTransactionCommand : ICommand {
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
-        val network = "testnet/api"
+        val network: String
+        if(plugin.getParameter<String>("btcli4j-network") == "bitcoin"){
+            network = "api"
+        }else{
+            network = "${plugin.getParameter<String>("btcli4j-network")}/api"
+        }
         val txRaw = request["tx"].asString
         try {
             val reqSendTx = HttpRequestFactory.createRequest("%s/tx".format(network), type = "post", body = txRaw,

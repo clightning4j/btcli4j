@@ -31,7 +31,12 @@ import okio.IOException
 class GetRawBlockByHeightCommand : ICommand {
 
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
-        val network = "testnet/api"
+        val network: String
+        if(plugin.getParameter<String>("btcli4j-network") == "bitcoin"){
+            network = "api"
+        }else{
+            network = "${plugin.getParameter<String>("btcli4j-network")}/api"
+        }
         val heightRequest = request["height"].asLong
         try {
 
