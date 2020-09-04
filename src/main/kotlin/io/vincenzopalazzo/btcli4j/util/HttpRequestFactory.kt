@@ -85,6 +85,7 @@ object HttpRequestFactory {
     /**
      * This method is designed to retry the request 4 time and wait for each error 1 minute
      */
+    @Throws(IOException::class)
     fun execRequest(request: Request): ByteString{
         var response: Response? = null
         var retryTime = 0
@@ -111,12 +112,12 @@ object HttpRequestFactory {
                 response.close()
                 return result
             }
-            throw CLightningPluginException(400, "Request error: ${response?.message}")
+            throw CLightningPluginException(400, "Request error: ${response?.message} with url ${request.url}")
         }
     }
 
     private fun isValid(response: Response?): Boolean{
-        return response != null && (!response!!.isSuccessful || response!!.body!!.toString() != "{}")
+        return response != null && (response.isSuccessful || response.body!!.toString() != "{}")
     }
 
     private fun buildPostRequest(url: String, body: String, mediaType: MediaType): Request {
