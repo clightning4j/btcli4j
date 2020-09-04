@@ -14,7 +14,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("com.squareup.okhttp3:okhttp:4.8.1")
 
-    api(fileTree("${project.projectDir}/devlib") { include("jrpclightning-0.1.6-SNAPSHOT.jar") })
+    api(fileTree("${project.projectDir}/devlib") { include("jrpclightning-0.1.7-SNAPSHOT.jar") })
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
@@ -37,5 +37,16 @@ tasks {
         val sourcesMain = sourceSets.main.get()
         sourcesMain.allSource.forEach { println("add from sources: ${it.name}") }
         from(sourcesMain.output)
+    }
+
+    register("createRunnableScript") {
+        dependsOn("fatJar")
+        file("${projectDir}/${project.name}-gen.sh").createNewFile()
+        file("${projectDir}/${project.name}-gen.sh").writeText(
+                """
+                # Script generated from gradle! By clightning4j
+                #!/bin/bash
+                ${System.getProperties().getProperty("java.home")}/bin/java -jar ${project.buildDir.absolutePath}/libs/${project.name}-all.jar
+                """.trimIndent())
     }
 }

@@ -1,1 +1,66 @@
-btcli4j
+## Btcli4j
+
+It is a [c-lightning]() plugin to override Bitcoin backend plugin with [esplora](https://github.com/Blockstream/esplora) by [Blockstream](https://blockstream.com/).
+
+But, this plugin is designed make the process to run c-lightning with bitcoind in pruning mode, the idea of this plugin was
+described inside this [issue by lightningd](https://github.com/lightningd/plugins/issues/112).
+
+The plugin use the mediator patter and each mediator call can use esplora or bitcoind or a both in some cases.
+
+So, the plugin will support the complete backend with only with esplora and the complete backend only with bitcoind or a join of the two option!
+
+## Status
+
+The plugin at the moment is under developing, but it should support the esplora backend (on testnet).
+
+If you want test it all feedback are welcome! Feel free to open an issue or a PR or in addition, you can send
+email to [vincenzopalazzodev@gmail.com](mailito://vincenzopalazzodev@gmail.com)
+
+## Install
+(!! *FOR THE MOMENT* Compatible only with JDK13 because the library [JRPCLightning]() is under developing and is a static jar inside devlib directory!!)
+
+Java produces a jar and c-lightning needs a bash script to run it! 
+The plugin compiles the plugin and makes the script with the command `./gradlew createRunnableScript`
+
+After the gradual process, you have the jar inside the `build/libs/qr-cli-all.jar` and the script `qr-cli-gen.sh` 
+in the root directory of the project.
+
+### How bash script look like
+
+The contains only the command to run the jar with java, in my cases the script contains the following result>
+
+```bash
+#!/bin/bash
+/usr/lib/jvm/jdk-13.0.2/bin/java -jar /home/vincent/Github/qr-cli/build/libs/qr-cli-all.jar
+```
+
+In this case, you can move this bash script inside your `./lightning/plugins` the directory or you can add the plugin to the file conf
+with `plugin=/PATH/bash/file` or use the command line `--plugin=/path/bash/file`.
+
+## Built with
+
+- [JQRInterface](https://gitlab.com/vincenzopalazzo/jconsole-qr)
+- [JRPClightning](https://github.com/vincenzopalazzo/JRPClightning)
+
+## License
+
+<div align="center">
+  <img src="https://opensource.org/files/osi_keyhole_300X300_90ppi_0.png" width="150" height="150"/>
+</div>
+
+ It is a plugin for c-lightning to display a QR code on a View!
+
+ Copyright (C) 2020 Vincenzo Palazzo vincenzopalazzodev@gmail.com
+ 
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along
+ with this program; if not, write to the Free Software Foundation, Inc.,
+ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.

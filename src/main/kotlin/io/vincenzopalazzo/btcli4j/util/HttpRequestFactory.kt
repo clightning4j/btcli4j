@@ -1,17 +1,41 @@
+/**
+ *  C-lightning plugin to override Bitcoin backend plugin.
+ *  Copyright (C) 2020 Vincenzo Palazzo vincenzopalazzodev@gmail.com
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package io.vincenzopalazzo.btcli4j.util
 
-import okhttp3.MediaType
+import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
 import okio.ByteString
+import okio.IOException
+import java.util.concurrent.TimeUnit
 
+/**
+ * @author https://github.com/vincenzopalazzo
+ */
 object HttpRequestFactory {
 
     private const val BASE_URL = "https://blockstream.info"
+    private const val RETRY_TIME: Long = 60000
 
-    private val client = OkHttpClient()
+    private val client = OkHttpClient.Builder()
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(15, TimeUnit.SECONDS)
+            .build()
 
     fun createRequest(url: String, type: String = "get", body: String = "", mediaType: MediaType = "application/json; charset=utf-8".toMediaType()): Request?{
         val completeUrl = "%s/%s".format(BASE_URL, url)
@@ -22,8 +46,36 @@ object HttpRequestFactory {
         return null
     }
 
+    /**
+     * This method is designed to retry the request 4 time and wait for each error 1 minute
+     */
     fun execRequest(request: Request): ByteString{
-        return client.newCall(request).execute().body!!.byteString()
+        var response: Response? = null
+        var retryTime = 0
+        try {
+            response = client.newCall(request).execute()
+            while (!isValid(response) && retryTime < 4){
+                retryTime++
+                Thread.sleep(RETRY_TIME)
+                response = client.newCall(request).execute()
+            }
+        }catch (ex: IOException){
+            while (!isValid(response) && retryTime < 4){
+                retryTime++
+                Thread.sleep(RETRY_TIME)
+                response = client.newCall(request).execute()
+            }
+            throw ex
+        }finally {
+            if(response != null && response.isSuccessful){
+                return response.body!!.byteString()
+            }
+        }
+        return response!!.body!!.byteString()
+    }
+
+    private fun isValid(response: Response?): Boolean{
+        return response != null || (!response!!.isSuccessful || response!!.body!!.toString() == "{}")
     }
 
     private fun buildPostRequest(url: String, body: String, mediaType: MediaType): Request {

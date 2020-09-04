@@ -1,3 +1,21 @@
+/**
+ *  C-lightning plugin to override Bitcoin backend plugin.
+ *  Copyright (C) 2020 Vincenzo Palazzo vincenzopalazzodev@gmail.com
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package io.vincenzopalazzo.btcli4j
 
 import io.vincenzopalazzo.btcli4j.control.MediationMethod
@@ -5,31 +23,33 @@ import jrpc.clightning.annotation.RPCMethod
 import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 
+/**
+ * @author https://github.com/vincenzopalazzo
+ */
 class Plugin: CLightningPlugin(){
 
-    @RPCMethod(name = "getchaininfo", description = "getchaininfo to fecth the data from blockstream.info")
+    @RPCMethod(name = "getchaininfo", description = "getchaininfo to fetch the data from blockstream.info")
     fun getChainInfo(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject){
         MediationMethod.runCommand("getchaininfo", plugin, CLightningJsonObject(request["params"].asJsonObject), response)
     }
 
-    @RPCMethod(name = "estimatefees", description = "estimatefees to fect the feed stimation from blockstream.info")
+    @RPCMethod(name = "estimatefees", description = "estimatefees to fetch the feed estimation from blockstream.info")
     fun estimateFees(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject){
         MediationMethod.runCommand("estimatefees", plugin, CLightningJsonObject(request["params"].asJsonObject), response)
     }
 
-    @RPCMethod(name = "getrawblockbyheight", description = "")
+    @RPCMethod(name = "getrawblockbyheight", description = "getrawblockbyheight to fetch actual blockchain height from blockstream.info")
     fun getRawBlockByHeight(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject){
         MediationMethod.runCommand("getrawblockbyheight", plugin, CLightningJsonObject(request["params"].asJsonObject), response)
     }
 
-    @RPCMethod(name = "getutxout", description = "")
+    @RPCMethod(name = "getutxout", description = "getutxout to fetch a utx with {txid} and {vout} from blockstream.info")
     fun getUtxOut(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject){
         MediationMethod.runCommand("getutxout", plugin, CLightningJsonObject(request["params"].asJsonObject), response)
     }
 
-    @RPCMethod(name = "sendrawtransaction", description = "")
+    @RPCMethod(name = "sendrawtransaction", description = "sendrawtransaction to publish a new transaction with blockstream.info")
     fun sendRawTransaction(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject){
         MediationMethod.runCommand("sendrawtransaction", plugin, CLightningJsonObject(request["params"].asJsonObject), response)
     }
-
 }
