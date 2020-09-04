@@ -110,7 +110,7 @@ object HttpRequestFactory {
     }
 
     private fun isValid(response: Response?): Boolean{
-        return response != null || (!response!!.isSuccessful || response!!.body!!.toString() == "{}")
+        return response != null && (!response!!.isSuccessful || response!!.body!!.toString() == "{}")
     }
 
     private fun buildPostRequest(url: String, body: String, mediaType: MediaType): Request {
