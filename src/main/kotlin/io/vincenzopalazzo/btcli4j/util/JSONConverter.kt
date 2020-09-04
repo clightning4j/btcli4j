@@ -18,8 +18,10 @@
  */
 package io.vincenzopalazzo.btcli4j.util
 
-import com.google.gson.GsonBuilder
+import com.google.gson.*
+import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
+import java.math.BigDecimal
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -29,6 +31,12 @@ object JSONConverter {
     private val gsonBuilder = GsonBuilder()
 
     init {
+        gsonBuilder.registerTypeAdapter(object: TypeToken<Double>() {}.type, object : JsonSerializer<Double> {
+            override fun serialize(src: Double, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
+                val value = BigDecimal.valueOf(src)
+                return JsonPrimitive(value)
+            }
+        })
         gsonBuilder.setPrettyPrinting()
     }
 

@@ -44,16 +44,6 @@ class GetRawBlockByHeightCommand : ICommand {
 
             val resBlockHash = HttpRequestFactory.execRequest(blockWithHeight).utf8()
 
-            if (resBlockHash.contains("Block not found")) {
-                //Lightningd continue to require bitcoin block and it know that the block is the last
-                //only if it receive the object with null proprieties
-                response.apply {
-                    add("blockhash", null)
-                    add("block", null)
-                }
-                return
-            }
-
             plugin.log(PluginLog.DEBUG, "$blockWithHeight Hash $resBlockHash")
             var hexBlock: String? = null
             if (resBlockHash.isNotEmpty()) {
@@ -68,6 +58,17 @@ class GetRawBlockByHeightCommand : ICommand {
         } catch (ex: IOException) {
             plugin.log(PluginLog.WARNING, ex.localizedMessage)
             throw CLightningPluginException(400, ex.localizedMessage)
+        }catch (pluginEx: CLightningPluginException){
+            if (pluginEx.message!!.contains("not found")) {
+                //Lightningd continue to require bitcoin block and it know that the block is the last
+                //only if it receive the object with null proprieties
+                response.apply {
+                    add("blockhash", null)
+                    add("block", null)
+                }
+                return
+            }
+            throw pluginEx
         }
     }
 }

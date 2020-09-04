@@ -55,8 +55,6 @@ class EstimateFeeCommand : ICommand {
             }
 
             if (estimateFee != null && !estimateFee.isEmpty()) {
-                plugin.log(PluginLog.WARNING, "ESTIMATION FEE 2: ${estimateFee.twoConfirmation}")
-                plugin.log(PluginLog.WARNING, "ESTIMATION FEE 2: ${estimateFee.oneHundredXXConfirmation}")
                 response.apply {
                     add("opening", estimateFee.oneHundredXXConfirmation)
                     add("mutual_close", estimateFee.oneHundredXXConfirmation)
@@ -70,7 +68,16 @@ class EstimateFeeCommand : ICommand {
                 plugin.log(PluginLog.WARNING, response)
             } else if (estimateFee != null && estimateFee.isEmpty()) {
                 plugin.log(PluginLog.ERROR, "Estimate fee empty")
-                throw CLightningPluginException(400, "Estimate fee empty")
+                response.apply {
+                    add("opening", null)
+                    add("mutual_close", null)
+                    add("unilateral_close", null)
+                    add("delayed_to_us", null)
+                    add("htlc_resolution", null)
+                    add("penalty", null)
+                    add("min_acceptable", null)
+                    add("max_acceptable", null)
+                }
             }
         }catch (ex: IOException){
             plugin.log(PluginLog.ERROR, ex.localizedMessage)

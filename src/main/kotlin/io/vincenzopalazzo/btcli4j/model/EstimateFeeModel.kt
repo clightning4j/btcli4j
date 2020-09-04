@@ -26,43 +26,43 @@ import com.google.gson.annotations.SerializedName
 class EstimateFeeModel {
 
     @SerializedName("1")
-    val oneConfirmation: Float = 0f
+    val oneConfirmation: Double = 0.0
         get() = field / 10000
 
     @SerializedName("2")
-    val twoConfirmation: Float = 0f
+    val twoConfirmation: Double = 0.0
         get() = field / 10000
 
     @SerializedName("3")
-    val treeConfirmation: Float = 0f
+    val treeConfirmation: Double = 0.0
         get() = field / 10000
 
     @SerializedName("4")
-    val fourConfirmation: Float = 0f
+    val fourConfirmation: Double = 0.0
         get() = field / 10000
 
     //TODO miss some properiety
 
     @SerializedName("144")
-    val oneHundredXXConfirmation: Float = 0f
+    val oneHundredXXConfirmation: Double = 0.0
         get() = field / 10000
 
     @SerializedName("504")
-    val fiveHundredXXConfirmation: Float = 0f
+    val fiveHundredXXConfirmation: Double = 0.0
         get() = field / 10000
 
     @SerializedName("1008")
-    val oneThousandXXConfirmation: Float = 0f
+    val oneThousandXXConfirmation: Double = 0.0
         get() = field / 10000
 
     fun isEmpty(): Boolean {
-        val empty = oneConfirmation == 0f ||
-                twoConfirmation == 0f ||
-                treeConfirmation == 0f ||
-                fourConfirmation == 0f ||
-                oneHundredXXConfirmation == 0f ||
-                fiveHundredXXConfirmation == 0f ||
-                oneThousandXXConfirmation == 0f
+        val empty = oneConfirmation == 0.0 &&
+                twoConfirmation == 0.0  &&
+                treeConfirmation == 0.0  &&
+                fourConfirmation == 0.0  &&
+                oneHundredXXConfirmation == 0.0  &&
+                fiveHundredXXConfirmation == 0.0  &&
+                oneThousandXXConfirmation == 0.0
 
         return empty
     }

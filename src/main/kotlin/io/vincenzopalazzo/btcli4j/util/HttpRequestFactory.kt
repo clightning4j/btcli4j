@@ -112,12 +112,12 @@ object HttpRequestFactory {
                 response.close()
                 return result
             }
-            throw CLightningPluginException(400, "Request error: ${response?.message} with url ${request.url}")
+            throw CLightningPluginException(response?.code ?: 400, "Request error: ${response?.message} with url ${request.url}")
         }
     }
 
     private fun isValid(response: Response?): Boolean{
-        return response != null && (response.isSuccessful || response.body!!.toString() != "{}")
+        return response != null && (response.isSuccessful || response.message.isNotEmpty())
     }
 
     private fun buildPostRequest(url: String, body: String, mediaType: MediaType): Request {
