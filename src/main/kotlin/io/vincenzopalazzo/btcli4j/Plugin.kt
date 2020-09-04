@@ -87,7 +87,7 @@ class Plugin: CLightningPlugin(){
         if(!pluginInit){
             this.network = plugin.getParameter("btcli4j-network")
             this.proxy = plugin.getParameter("btcli4j-proxy")
-            this.proxyEnable = plugin.getParameter("btcli4j-proxy-enable")
+            this.proxyEnable = plugin.getParameter("btcli4j-proxy-enable") ?: false
             log(PluginLog.WARNING, "proxy enable: $proxyEnable")
             if(proxyEnable){
                 HttpRequestFactory.configureProxy(this.proxy, true)

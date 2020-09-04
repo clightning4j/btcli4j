@@ -18,6 +18,7 @@
  */
 package io.vincenzopalazzo.btcli4j.util
 
+import jrpc.clightning.plugins.exceptions.CLightningPluginException
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okio.ByteString
@@ -87,30 +88,35 @@ object HttpRequestFactory {
     fun execRequest(request: Request): ByteString{
         var response: Response? = null
         var retryTime = 0
+        val result: ByteString
         try {
             response = client.newCall(request).execute()
             while (!isValid(response) && retryTime < 4){
                 retryTime++
+                response?.body?.close()
                 Thread.sleep(RETRY_TIME)
                 response = client.newCall(request).execute()
             }
         }catch (ex: IOException){
             while (!isValid(response) && retryTime < 4){
                 retryTime++
+                response?.body?.close()
                 Thread.sleep(RETRY_TIME)
                 response = client.newCall(request).execute()
             }
             throw ex
         }finally {
             if(response != null && response.isSuccessful){
-                return response.body!!.byteString()
+                result = response.body!!.byteString()
+                response.close()
+                return result
             }
+            throw CLightningPluginException(400, "Request error: ${response?.message}")
         }
-        return response!!.body!!.byteString()
     }
 
     private fun isValid(response: Response?): Boolean{
-        return response != null && (!response!!.isSuccessful || response!!.body!!.toString() == "{}")
+        return response != null && (!response!!.isSuccessful || response!!.body!!.toString() != "{}")
     }
 
     private fun buildPostRequest(url: String, body: String, mediaType: MediaType): Request {

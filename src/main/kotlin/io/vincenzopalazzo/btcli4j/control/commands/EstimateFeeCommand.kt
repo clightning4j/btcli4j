@@ -26,6 +26,7 @@ import jrpc.clightning.plugins.exceptions.CLightningPluginException
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 import java.io.IOException
+import kotlin.math.log
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -54,15 +55,17 @@ class EstimateFeeCommand : ICommand {
             }
 
             if (estimateFee != null && !estimateFee.isEmpty()) {
+                plugin.log(PluginLog.WARNING, "ESTIMATION FEE 2: ${estimateFee.twoConfirmation}")
+                plugin.log(PluginLog.WARNING, "ESTIMATION FEE 2: ${estimateFee.oneHundredXXConfirmation}")
                 response.apply {
-                    add("opening", estimateFee.twoConfirmation)
-                    add("mutual_close", estimateFee.twoConfirmation)
-                    add("unilateral_close", estimateFee.twoConfirmation)
-                    add("delayed_to_us", estimateFee.twoConfirmation)
-                    add("htlc_resolution", estimateFee.twoConfirmation)
-                    add("penalty", estimateFee.twoConfirmation)
-                    add("min_acceptable", estimateFee.twoConfirmation / 2)
-                    add("max_acceptable", estimateFee.oneConfirmation * 10)
+                    add("opening", estimateFee.oneHundredXXConfirmation)
+                    add("mutual_close", estimateFee.oneHundredXXConfirmation)
+                    add("unilateral_close", estimateFee.oneHundredXXConfirmation)
+                    add("delayed_to_us", estimateFee.oneHundredXXConfirmation)
+                    add("htlc_resolution", estimateFee.oneHundredXXConfirmation)
+                    add("penalty", estimateFee.oneHundredXXConfirmation)
+                    add("min_acceptable", estimateFee.oneHundredXXConfirmation / 2)
+                    add("max_acceptable", estimateFee.oneHundredXXConfirmation * 10)
                 }
                 plugin.log(PluginLog.WARNING, response)
             } else if (estimateFee != null && estimateFee.isEmpty()) {
