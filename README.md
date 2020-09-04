@@ -1,6 +1,6 @@
 ## Btcli4j
 
-It is a [c-lightning]() plugin to override Bitcoin backend plugin with [esplora](https://github.com/Blockstream/esplora) by [Blockstream](https://blockstream.com/).
+It is a [c-lightning](https://lightning.readthedocs.io/index.html) plugin to override Bitcoin backend plugin with [esplora](https://github.com/Blockstream/esplora) by [Blockstream](https://blockstream.com/).
 
 But, this plugin is designed make the process to run c-lightning with bitcoind in pruning mode, the idea of this plugin was
 described inside this [issue by lightningd](https://github.com/lightningd/plugins/issues/112).
@@ -20,9 +20,9 @@ email to [vincenzopalazzodev@gmail.com](mailito://vincenzopalazzodev@gmail.com)
 (!! *FOR THE MOMENT* Compatible only with JDK13 because the library [JRPCLightning]() is under developing and is a static jar inside devlib directory!!)
 
 Java produces a jar and c-lightning needs a bash script to run it! 
-The plugin compiles the plugin and makes the script with the command `./gradlew createRunnableScript`
+The gradle script compiles the plugin and generate a bash script with the command `./gradlew createRunnableScript`
 
-After the gradual process, you have the jar inside the `build/libs/qr-cli-all.jar` and the script `qr-cli-gen.sh` 
+After the gradual process, you have the jar inside the `build/libs/btcli4j-all.jar` and the script `btcli4j-gen.sh` 
 in the root directory of the project.
 
 ### How bash script look like
@@ -39,7 +39,6 @@ with `plugin=/PATH/bash/file` or use the command line `--plugin=/path/bash/file`
 
 ## Built with
 
-- [JQRInterface](https://gitlab.com/vincenzopalazzo/jconsole-qr)
 - [JRPClightning](https://github.com/vincenzopalazzo/JRPClightning)
 
 ## License
@@ -48,7 +47,7 @@ with `plugin=/PATH/bash/file` or use the command line `--plugin=/path/bash/file`
   <img src="https://opensource.org/files/osi_keyhole_300X300_90ppi_0.png" width="150" height="150"/>
 </div>
 
- It is a plugin for c-lightning to display a QR code on a View!
+ It is a c-lightning plugin to override Bitcoin backend plugin with esplora.
 
  Copyright (C) 2020 Vincenzo Palazzo vincenzopalazzodev@gmail.com
  
