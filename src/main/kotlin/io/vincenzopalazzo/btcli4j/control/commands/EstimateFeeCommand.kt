@@ -39,7 +39,7 @@ class EstimateFeeCommand : ICommand {
             val reqEstimateFee = HttpRequestFactory.createRequest("%s/fee-estimates".format(queryUrl))!!
             val estimateFee: EstimateFeeModel
 
-            val resEstimateFee = HttpRequestFactory.execRequest(reqEstimateFee).utf8()
+            val resEstimateFee = HttpRequestFactory.execRequest(plugin, reqEstimateFee).utf8()
             if (resEstimateFee.isNotEmpty() && !reqEstimateFee.equals("{}")) {
                 plugin.log(PluginLog.DEBUG, "Estimate fee $resEstimateFee")
                 estimateFee = JSONConverter.deserialize(resEstimateFee, EstimateFeeModel::class.java)
@@ -50,14 +50,14 @@ class EstimateFeeCommand : ICommand {
 
             if (!estimateFee.isEmpty()) {
                 response.apply {
-                    add("opening", estimateFee.getAverageEstimateFee())
-                    add("mutual_close", estimateFee.getAverageEstimateFee())
-                    add("unilateral_close", estimateFee.getAverageEstimateFee())
-                    add("delayed_to_us", estimateFee.getAverageEstimateFee())
-                    add("htlc_resolution", estimateFee.getAverageEstimateFee())
-                    add("penalty", estimateFee.getAverageEstimateFee())
-                    add("min_acceptable", estimateFee.getAverageEstimateFee() / 2)
-                    add("max_acceptable", estimateFee.getAverageEstimateFee() * 10)
+                    add("opening", estimateFee.estimateFeeForNormalTarget().toInt())
+                    add("mutual_close", estimateFee.estimateFeeForSlowTarget().toInt())
+                    add("unilateral_close", estimateFee.estimateFeeForUrgentTarget().toInt())
+                    add("delayed_to_us", estimateFee.estimateFeeForSlowTarget().toInt())
+                    add("htlc_resolution", estimateFee.estimateFeeForNormalTarget().toInt())
+                    add("penalty", estimateFee.getAverageEstimateFee().toInt())
+                    add("min_acceptable", estimateFee.estimateFeeForSlowTarget().toInt() / 2)
+                    add("max_acceptable", estimateFee.estimateFeeForVeryUrgentTarget().toInt() * 10)
                 }
                 plugin.log(PluginLog.WARNING, response)
             } else if (estimateFee.isEmpty()) {

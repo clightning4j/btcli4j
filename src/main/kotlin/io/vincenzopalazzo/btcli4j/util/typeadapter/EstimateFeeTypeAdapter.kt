@@ -29,7 +29,7 @@ class EstimateFeeTypeAdapter : TypeAdapter<EstimateFeeModel>() {
                 key = jsonReader.nextName().toInt()
                 //move to next token
                 token = jsonReader.peek()
-                feerate.putValue(key, BigDecimal.valueOf(jsonReader.nextDouble()).toDouble())
+                feerate.putValue(key, BigDecimal.valueOf(jsonReader.nextDouble() * 100).toDouble())
             }
         }
         jsonReader.endObject()

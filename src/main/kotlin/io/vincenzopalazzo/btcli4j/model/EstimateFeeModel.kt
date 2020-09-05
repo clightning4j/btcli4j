@@ -42,6 +42,59 @@ class EstimateFeeModel {
         return mapEstimationFee.isEmpty()
     }
 
+    fun estimateFeeForSlowTarget(): Double {
+        var bigKey = 0
+        var result = 0.0
+        if (mapEstimationFee.containsKey(144)){
+            return mapEstimationFee[144]!!
+        }
+        mapEstimationFee.forEach {
+            if(bigKey < it.key){
+                bigKey = it.key
+                result = it.value
+            }
+        }
+        return result
+    }
+
+    fun estimateFeeForNormalTarget(): Double {
+        if (containsKey(5)){
+            return getValue(5)
+        }else if(containsKey(6)){
+            return getValue(6)
+        }else if (containsKey(4)){
+            return  getValue(5)
+        }
+        return estimateFeeForSlowTarget()
+    }
+
+    fun estimateFeeForUrgentTarget(): Double {
+        if (containsKey(3)){
+            return getValue(3)
+        }else if(containsKey(2)){
+            return getValue(2)
+        }else if (containsKey(4)){
+            return  getValue(4)
+        }
+        //TOD change this with very urgent
+        return estimateFeeForVeryUrgentTarget()
+    }
+
+    fun estimateFeeForVeryUrgentTarget(): Double {
+        var bigKey = 0
+        var result = 0.0
+        if (mapEstimationFee.containsKey(2)){
+            return mapEstimationFee[2]!!
+        }
+        mapEstimationFee.forEach {
+            if(bigKey > it.key){
+                bigKey = it.key
+                result = it.value
+            }
+        }
+        return result
+    }
+
     //FIXME very stupid fee estimation!
     fun getAverageEstimateFee(): Double{
         var correctValue = 0.0

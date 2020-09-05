@@ -45,7 +45,7 @@ class GetUtxOutCommand : ICommand {
             if (getUTXOInformation(plugin, txId, vOut, response)) {
                 //The transaction wasn't spent!!
                 val reqTxInformation = HttpRequestFactory.createRequest("%s/tx/%s".format(queryUrl, txId))!!
-                val resTxInformation = HttpRequestFactory.execRequest(reqTxInformation).utf8()
+                val resTxInformation = HttpRequestFactory.execRequest(plugin, reqTxInformation).utf8()
                 if (resTxInformation.isNotEmpty() /*&& resTxInformation !== "{}" */) {
                     val transactionInformation = JSONConverter.deserialize<BTCTransactionModel>(resTxInformation, BTCTransactionModel::class.java)
                     val transactionOutput = transactionInformation.transactionsOutput?.get(vOut)!!
@@ -67,7 +67,7 @@ class GetUtxOutCommand : ICommand {
      */
     private fun getUTXOInformation(plugin: CLightningPlugin, txId: String, vout: Int, response: CLightningJsonObject): Boolean {
         val requestUtxo = HttpRequestFactory.createRequest("%s/tx/%s/outspend/%s".format(network, txId, vout))!!
-        val resUtxo = HttpRequestFactory.execRequest(requestUtxo).utf8()
+        val resUtxo = HttpRequestFactory.execRequest(plugin, requestUtxo).utf8()
         if (resUtxo.isNotEmpty() /*&& resUtxo !== "{}"*/) {
             val statusUtxo = JSONConverter.deserialize<StatusUTXOModel>(resUtxo, StatusUTXOModel::class.java)
             /* As of at least v0.15.1.0, bitcoind returns "success" but an empty

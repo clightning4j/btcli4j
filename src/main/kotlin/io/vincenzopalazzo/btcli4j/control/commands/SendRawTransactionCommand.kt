@@ -38,7 +38,7 @@ class SendRawTransactionCommand : ICommand {
             val reqSendTx = HttpRequestFactory.createRequest("%s/tx".format(queryUrl), type = "post", body = txRaw,
                     mediaType = "plain/text; charset=utf-8".toMediaType())!!
 
-            val resSendTx = HttpRequestFactory.execRequest(reqSendTx).utf8()
+            val resSendTx = HttpRequestFactory.execRequest(plugin, reqSendTx).utf8()
 
             response.apply {
                 add("success", resSendTx.isNotEmpty()) // TODO validate if it is a txId

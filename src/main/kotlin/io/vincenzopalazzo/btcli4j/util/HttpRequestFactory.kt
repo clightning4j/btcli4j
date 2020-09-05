@@ -18,6 +18,9 @@
  */
 package io.vincenzopalazzo.btcli4j.util
 
+import com.sun.source.util.Plugin
+import jrpc.clightning.plugins.CLightningPlugin
+import jrpc.clightning.plugins.log.PluginLog
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okio.ByteString
@@ -39,6 +42,7 @@ object HttpRequestFactory {
     private var proxyEnabled: Boolean = false
     private var client = OkHttpClient.Builder()
             .connectTimeout(1, TimeUnit.MINUTES)
+            .writeTimeout(1, TimeUnit.MINUTES)
             .readTimeout(1, TimeUnit.MINUTES)
             .build()
 
@@ -52,6 +56,7 @@ object HttpRequestFactory {
             client = OkHttpClient.Builder()
                     .proxy(proxyTor)
                     .connectTimeout(2, TimeUnit.MINUTES)
+                    .writeTimeout(2, TimeUnit.MINUTES)
                     .readTimeout(2, TimeUnit.MINUTES)
                     .build()
             proxyEnabled = true
@@ -91,16 +96,35 @@ object HttpRequestFactory {
      * This method is designed to retry the request 4 time and wait for each error 1 minute
      */
     @Throws(IOException::class)
-    fun execRequest(request: Request): ByteString {
+    fun execRequest(plugin: CLightningPlugin, request: Request): ByteString {
         var response: Response = client.newCall(request).execute()
         var retryTime = 0
+        val result: ByteString
         while (!isValid(response) && retryTime < 4) {
+            plugin.log(PluginLog.ERROR, "During http request to URL ${request.url}")
+            plugin.log(PluginLog.ERROR, "With error message ${request.body}")
+            plugin.log(PluginLog.ERROR, "retry time ${retryTime}")
             retryTime++
             Thread.sleep(WAIT_TIME)
             response.body?.close()
-            response = client.newCall(request).execute()
+            try {
+                response = client.newCall(request).execute()
+            }catch (ex: IOException){
+                plugin.log(PluginLog.ERROR, "Error during request to URL ${request.url}")
+                plugin.log(PluginLog.ERROR, "Error received is ${ex.localizedMessage}")
+                if(ex.localizedMessage.contains("Connect timed out")){
+                    retryTime-- //Decrease the value, because this value should be happen not very offen
+                    plugin.log(PluginLog.ERROR, "Wait ${WAIT_TIME * 5} (5 minutes) before to retry")
+                    // There are too connection to the server and with this code I will wait some time before to died
+                    Thread.sleep(WAIT_TIME * 5)
+                    continue
+                }
+                throw ex // If the error isn't caused from timeout error, at this point I can throw the exception
+            }
         }
-        return response.body!!.byteString()
+        result = response.body!!.byteString()
+        response.body?.close()
+        return result
     }
 
     private fun isValid(response: Response?): Boolean {
@@ -109,7 +133,7 @@ object HttpRequestFactory {
     }
 
     private fun buildPostRequest(url: String, body: String, mediaType: MediaType): Request {
-        val requestBody = RequestBody.Companion.create(mediaType, body)
+        val requestBody = RequestBody.create(mediaType, body)
         val request = Request.Builder()
                 .url(url)
                 .post(requestBody)

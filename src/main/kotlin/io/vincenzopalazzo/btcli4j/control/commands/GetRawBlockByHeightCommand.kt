@@ -35,13 +35,13 @@ class GetRawBlockByHeightCommand : ICommand {
         val heightRequest = request["height"].asLong
         try {
             val blockWithHeight = HttpRequestFactory.createRequest("%s/block-height/%s".format(queryUrl, heightRequest))!!
-            val resBlockHash = HttpRequestFactory.execRequest(blockWithHeight).utf8()
+            val resBlockHash = HttpRequestFactory.execRequest(plugin, blockWithHeight).utf8()
 
             plugin.log(PluginLog.DEBUG, "$blockWithHeight Hash $resBlockHash")
             val hexBlock: String
             if (resBlockHash.isNotEmpty() && resBlockHash != "Block not found") {
                 val blockWithHash = HttpRequestFactory.createRequest("%s/block/%s/raw".format(queryUrl, resBlockHash))!!
-                hexBlock = HttpRequestFactory.execRequest(blockWithHash).hex()
+                hexBlock = HttpRequestFactory.execRequest(plugin, blockWithHash).hex()
                 response.apply {
                     add("blockhash", resBlockHash)
                     add("block", hexBlock)
