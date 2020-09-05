@@ -18,52 +18,36 @@
  */
 package io.vincenzopalazzo.btcli4j.model
 
-import com.google.gson.annotations.SerializedName
-
 /**
  * @author https://github.com/vincenzopalazzo
  */
 class EstimateFeeModel {
 
-    @SerializedName("1")
-    val oneConfirmation: Double = 0.0
-        get() = field / 10000
+    val mapEstimationFee = HashMap<Int, Double>()
+        get() = field
 
-    @SerializedName("2")
-    val twoConfirmation: Double = 0.0
-        get() = field / 10000
+    fun putValue(key: Int, value: Double){
+        mapEstimationFee.put(key, value)
+    }
 
-    @SerializedName("3")
-    val treeConfirmation: Double = 0.0
-        get() = field / 10000
+    fun getValue(key: Int): Double{
+        return mapEstimationFee.getOrDefault(key, 0.0)
+    }
 
-    @SerializedName("4")
-    val fourConfirmation: Double = 0.0
-        get() = field / 10000
-
-    //TODO miss some properiety
-
-    @SerializedName("144")
-    val oneHundredXXConfirmation: Double = 0.0
-        get() = field / 10000
-
-    @SerializedName("504")
-    val fiveHundredXXConfirmation: Double = 0.0
-        get() = field / 10000
-
-    @SerializedName("1008")
-    val oneThousandXXConfirmation: Double = 0.0
-        get() = field / 10000
+    fun containsKey(key: Int): Boolean{
+        return mapEstimationFee.containsKey(key)
+    }
 
     fun isEmpty(): Boolean {
-        val empty = oneConfirmation == 0.0 &&
-                twoConfirmation == 0.0  &&
-                treeConfirmation == 0.0  &&
-                fourConfirmation == 0.0  &&
-                oneHundredXXConfirmation == 0.0  &&
-                fiveHundredXXConfirmation == 0.0  &&
-                oneThousandXXConfirmation == 0.0
+        return mapEstimationFee.isEmpty()
+    }
 
-        return empty
+    //FIXME very stupid fee estimation!
+    fun getAverageEstimateFee(): Double{
+        var correctValue = 0.0
+        mapEstimationFee.forEach{
+            correctValue += it.value
+        }
+        return correctValue / mapEstimationFee.size
     }
 }

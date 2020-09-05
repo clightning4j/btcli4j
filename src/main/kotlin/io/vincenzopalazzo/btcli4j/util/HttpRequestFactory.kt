@@ -18,7 +18,6 @@
  */
 package io.vincenzopalazzo.btcli4j.util
 
-import jrpc.clightning.plugins.exceptions.CLightningPluginException
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okio.ByteString
@@ -26,7 +25,6 @@ import okio.IOException
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.util.concurrent.TimeUnit
-
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -36,46 +34,53 @@ object HttpRequestFactory {
     private const val BASE_URL = "https://blockstream.info"
     private const val BASE_URL_TORV3 = "http://explorerzydxu5ecjrkwceayqybizmpjjznk5izmitf2modhcusuqlid.onion"
     private const val BASE_URL_TORV2 = "http://explorernuoc63nb.onion"
-    private const val RETRY_TIME: Long = 60000
+    private const val WAIT_TIME: Long = 60000
 
     private var proxyEnabled: Boolean = false
     private var client = OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(1, TimeUnit.MINUTES)
+            .readTimeout(1, TimeUnit.MINUTES)
             .build()
 
-    fun configureProxy(proxyString: String, tor: Boolean = true){
+    fun configureProxy(proxyString: String, tor: Boolean = true) {
         val tokens = proxyString.split(":")
         val ip = tokens[0]
         val port = tokens[1]
         val proxyAddr = InetSocketAddress(ip, port.toInt())
-        if(tor){
+        if (tor) {
             val proxyTor = Proxy(Proxy.Type.SOCKS, proxyAddr)
             client = OkHttpClient.Builder()
-                        .proxy(proxyTor)
-                        .connectTimeout(30, TimeUnit.SECONDS)
-                        .readTimeout(30, TimeUnit.SECONDS)
-                        .build()
+                    .proxy(proxyTor)
+                    .connectTimeout(2, TimeUnit.MINUTES)
+                    .readTimeout(2, TimeUnit.MINUTES)
+                    .build()
             proxyEnabled = true
         }
+    }
+
+    fun buildQueryRL(network: String): String{
+        if(network == "bitcoin"){
+            return "api"
+        }
+        return "$network/api"
     }
 
     fun createRequest(url: String, type: String = "get", body: String = "",
                       mediaType: MediaType = "application/json; charset=utf-8".toMediaType(),
                       torVersion: Int = 3
-    ): Request?{
+    ): Request? {
         val baseUrl: String
-        if(proxyEnabled){
-            if(torVersion == 3){
+        if (proxyEnabled) {
+            if (torVersion == 3) {
                 baseUrl = BASE_URL_TORV3
-            }else{
+            } else {
                 baseUrl = BASE_URL_TORV2
             }
-        }else{
+        } else {
             baseUrl = BASE_URL
         }
         val completeUrl = "%s/%s".format(baseUrl, url)
-        when(type){
+        when (type) {
             "get" -> return buildGetRequest(completeUrl)
             "post" -> return buildPostRequest(completeUrl, body, mediaType)
         }
@@ -86,38 +91,21 @@ object HttpRequestFactory {
      * This method is designed to retry the request 4 time and wait for each error 1 minute
      */
     @Throws(IOException::class)
-    fun execRequest(request: Request): ByteString{
-        var response: Response? = null
+    fun execRequest(request: Request): ByteString {
+        var response: Response = client.newCall(request).execute()
         var retryTime = 0
-        val result: ByteString
-        try {
+        while (!isValid(response) && retryTime < 4) {
+            retryTime++
+            Thread.sleep(WAIT_TIME)
+            response.body?.close()
             response = client.newCall(request).execute()
-            while (!isValid(response) && retryTime < 4){
-                retryTime++
-                response?.body?.close()
-                Thread.sleep(RETRY_TIME)
-                response = client.newCall(request).execute()
-            }
-        }catch (ex: IOException){
-            while (!isValid(response) && retryTime < 4){
-                retryTime++
-                response?.body?.close()
-                Thread.sleep(RETRY_TIME)
-                response = client.newCall(request).execute()
-            }
-            throw ex
-        }finally {
-            if(response != null && response.isSuccessful){
-                result = response.body!!.byteString()
-                response.close()
-                return result
-            }
-            throw CLightningPluginException(response?.code ?: 400, "Request error: ${response?.message} with url ${request.url}")
         }
+        return response.body!!.byteString()
     }
 
-    private fun isValid(response: Response?): Boolean{
-        return response != null && (response.isSuccessful || response.message.isNotEmpty())
+    private fun isValid(response: Response?): Boolean {
+        return response != null && response.isSuccessful &&
+                !response.message.equals("not found", true)
     }
 
     private fun buildPostRequest(url: String, body: String, mediaType: MediaType): Request {

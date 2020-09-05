@@ -21,7 +21,6 @@ package io.vincenzopalazzo.btcli4j.control.commands
 import io.vincenzopalazzo.btcli4j.util.HttpRequestFactory
 import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.exceptions.CLightningPluginException
-import jrpc.clightning.plugins.log.CLightningLevelLog
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 import okio.IOException
@@ -31,26 +30,15 @@ import okio.IOException
  */
 class GetChainInfoCommand: ICommand {
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
-        //TODO refactoring the build network inside the HTTPFactory
-        val network: String
-        if(plugin.getParameter<String>("btcli4j-network") == "bitcoin"){
-            network = "api"
-        }else{
-            network = "${plugin.getParameter<String>("btcli4j-network")}/api"
-        }
+        val queryUrl = HttpRequestFactory.buildQueryRL(plugin.getParameter<String>("btcli4j-network"))
         try {
-            val reqGenesisBlock = HttpRequestFactory.createRequest("%s/block-height/0".format(network))
+            val reqGenesisBlock = HttpRequestFactory.createRequest("%s/block-height/0".format(queryUrl))
             plugin.log(PluginLog.WARNING, reqGenesisBlock!!.url)
             val genesisBlock: String
-            if(reqGenesisBlock != null){
-                genesisBlock = HttpRequestFactory.execRequest(reqGenesisBlock).utf8()
-                plugin.log(PluginLog.DEBUG, "Genesis block %s".format(genesisBlock))
-            }else{
-                plugin.log(PluginLog.ERROR, "Request for genesis block null!!!")
-                throw CLightningPluginException(400, "Request for genesis block null!!!")
-            }
+            genesisBlock = HttpRequestFactory.execRequest(reqGenesisBlock).utf8()
+            plugin.log(PluginLog.DEBUG, "Genesis block %s".format(genesisBlock))
 
-            val reqBlockchainHeight = HttpRequestFactory.createRequest("%s/blocks/tip/height".format(network))
+            val reqBlockchainHeight = HttpRequestFactory.createRequest("%s/blocks/tip/height".format(queryUrl))
             val blockCount: Int
             if(reqBlockchainHeight != null){
                 blockCount = HttpRequestFactory.execRequest(reqBlockchainHeight).utf8().toInt()

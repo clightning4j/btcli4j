@@ -36,23 +36,17 @@ class GetUtxOutCommand : ICommand {
     private lateinit var network: String
 
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
-        val network: String
-        if(plugin.getParameter<String>("btcli4j-network") == "bitcoin"){
-            network = "api"
-        }else{
-            network = "${plugin.getParameter<String>("btcli4j-network")}/api"
-        }
+        val queryUrl = HttpRequestFactory.buildQueryRL(plugin.getParameter<String>("btcli4j-network"))
         val txId = request["txid"].asString
         plugin.log(PluginLog.DEBUG, "TxId: $txId")
         val vOut = request["vout"].asInt
         plugin.log(PluginLog.DEBUG, "Vout: $vOut")
         try {
-
             if (getUTXOInformation(plugin, txId, vOut, response)) {
                 //The transaction wasn't spent!!
-                val reqTxInformation = HttpRequestFactory.createRequest("%s/tx/%s".format(network, txId))!!
+                val reqTxInformation = HttpRequestFactory.createRequest("%s/tx/%s".format(queryUrl, txId))!!
                 val resTxInformation = HttpRequestFactory.execRequest(reqTxInformation).utf8()
-                if (resTxInformation.isNotEmpty() && resTxInformation !== "{}") {
+                if (resTxInformation.isNotEmpty() /*&& resTxInformation !== "{}" */) {
                     val transactionInformation = JSONConverter.deserialize<BTCTransactionModel>(resTxInformation, BTCTransactionModel::class.java)
                     val transactionOutput = transactionInformation.transactionsOutput?.get(vOut)!!
                     response.apply {
@@ -74,19 +68,25 @@ class GetUtxOutCommand : ICommand {
     private fun getUTXOInformation(plugin: CLightningPlugin, txId: String, vout: Int, response: CLightningJsonObject): Boolean {
         val requestUtxo = HttpRequestFactory.createRequest("%s/tx/%s/outspend/%s".format(network, txId, vout))!!
         val resUtxo = HttpRequestFactory.execRequest(requestUtxo).utf8()
-        if (resUtxo.isNotEmpty() && resUtxo !== "{}") {
+        if (resUtxo.isNotEmpty() /*&& resUtxo !== "{}"*/) {
             val statusUtxo = JSONConverter.deserialize<StatusUTXOModel>(resUtxo, StatusUTXOModel::class.java)
             /* As of at least v0.15.1.0, bitcoind returns "success" but an empty
             string on a spent txout. */
             if (statusUtxo.spend) {
+                plugin.log(PluginLog.WARNING, "Tx with id: $txId was spent")
                 response.apply {
                     add("amount", null)
                     add("script", null)
                 }
                 return false
             }
+            return true //continue
         }
-        return true //continue
+        response.apply {
+            add("amount", null)
+            add("script", null)
+        }
+        return false
     }
 
 }

@@ -26,7 +26,6 @@ import jrpc.clightning.plugins.exceptions.CLightningPluginException
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 import java.io.IOException
-import kotlin.math.log
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -34,16 +33,11 @@ import kotlin.math.log
 class EstimateFeeCommand : ICommand {
 
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
-        val network: String
-        if(plugin.getParameter<String>("btcli4j-network") == "bitcoin"){
-            network = "api"
-        }else{
-            network = "${plugin.getParameter<String>("btcli4j-network")}/api"
-        }
+        val queryUrl = HttpRequestFactory.buildQueryRL(plugin.getParameter<String>("btcli4j-network"))
 
         try {
-            val reqEstimateFee = HttpRequestFactory.createRequest("%s/fee-estimates".format(network))!!
-            var estimateFee: EstimateFeeModel? = null
+            val reqEstimateFee = HttpRequestFactory.createRequest("%s/fee-estimates".format(queryUrl))!!
+            val estimateFee: EstimateFeeModel
 
             val resEstimateFee = HttpRequestFactory.execRequest(reqEstimateFee).utf8()
             if (resEstimateFee.isNotEmpty() && !reqEstimateFee.equals("{}")) {
@@ -54,19 +48,19 @@ class EstimateFeeCommand : ICommand {
                 throw CLightningPluginException(400, "Estimate fee empty from http response")
             }
 
-            if (estimateFee != null && !estimateFee.isEmpty()) {
+            if (!estimateFee.isEmpty()) {
                 response.apply {
-                    add("opening", estimateFee.oneHundredXXConfirmation)
-                    add("mutual_close", estimateFee.oneHundredXXConfirmation)
-                    add("unilateral_close", estimateFee.oneHundredXXConfirmation)
-                    add("delayed_to_us", estimateFee.oneHundredXXConfirmation)
-                    add("htlc_resolution", estimateFee.oneHundredXXConfirmation)
-                    add("penalty", estimateFee.oneHundredXXConfirmation)
-                    add("min_acceptable", estimateFee.oneHundredXXConfirmation / 2)
-                    add("max_acceptable", estimateFee.oneHundredXXConfirmation * 10)
+                    add("opening", estimateFee.getAverageEstimateFee())
+                    add("mutual_close", estimateFee.getAverageEstimateFee())
+                    add("unilateral_close", estimateFee.getAverageEstimateFee())
+                    add("delayed_to_us", estimateFee.getAverageEstimateFee())
+                    add("htlc_resolution", estimateFee.getAverageEstimateFee())
+                    add("penalty", estimateFee.getAverageEstimateFee())
+                    add("min_acceptable", estimateFee.getAverageEstimateFee() / 2)
+                    add("max_acceptable", estimateFee.getAverageEstimateFee() * 10)
                 }
                 plugin.log(PluginLog.WARNING, response)
-            } else if (estimateFee != null && estimateFee.isEmpty()) {
+            } else if (estimateFee.isEmpty()) {
                 plugin.log(PluginLog.ERROR, "Estimate fee empty")
                 response.apply {
                     add("opening", null)
@@ -79,7 +73,7 @@ class EstimateFeeCommand : ICommand {
                     add("max_acceptable", null)
                 }
             }
-        }catch (ex: IOException){
+        } catch (ex: IOException) {
             plugin.log(PluginLog.ERROR, ex.localizedMessage)
             throw CLightningPluginException(400, ex.localizedMessage)
         }

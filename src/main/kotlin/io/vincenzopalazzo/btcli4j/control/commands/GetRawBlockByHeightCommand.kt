@@ -31,44 +31,33 @@ import okio.IOException
 class GetRawBlockByHeightCommand : ICommand {
 
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
-        val network: String
-        if(plugin.getParameter<String>("btcli4j-network") == "bitcoin"){
-            network = "api"
-        }else{
-            network = "${plugin.getParameter<String>("btcli4j-network")}/api"
-        }
+        val queryUrl = HttpRequestFactory.buildQueryRL(plugin.getParameter<String>("btcli4j-network"))
         val heightRequest = request["height"].asLong
         try {
-
-            val blockWithHeight = HttpRequestFactory.createRequest("%s/block-height/%s".format(network, heightRequest))!!
-
+            val blockWithHeight = HttpRequestFactory.createRequest("%s/block-height/%s".format(queryUrl, heightRequest))!!
             val resBlockHash = HttpRequestFactory.execRequest(blockWithHeight).utf8()
 
             plugin.log(PluginLog.DEBUG, "$blockWithHeight Hash $resBlockHash")
-            var hexBlock: String? = null
-            if (resBlockHash.isNotEmpty()) {
-                val blockWithHash = HttpRequestFactory.createRequest("%s/block/%s/raw".format(network, resBlockHash))!!
+            val hexBlock: String
+            if (resBlockHash.isNotEmpty() && resBlockHash != "Block not found") {
+                val blockWithHash = HttpRequestFactory.createRequest("%s/block/%s/raw".format(queryUrl, resBlockHash))!!
                 hexBlock = HttpRequestFactory.execRequest(blockWithHash).hex()
-            }
-
-            response.apply {
-                add("blockhash", resBlockHash)
-                add("block", hexBlock)
-            }
-        } catch (ex: IOException) {
-            plugin.log(PluginLog.WARNING, ex.localizedMessage)
-            throw CLightningPluginException(400, ex.localizedMessage)
-        }catch (pluginEx: CLightningPluginException){
-            if (pluginEx.message!!.contains("not found")) {
+                response.apply {
+                    add("blockhash", resBlockHash)
+                    add("block", hexBlock)
+                }
+            }else{
                 //Lightningd continue to require bitcoin block and it know that the block is the last
                 //only if it receive the object with null proprieties
                 response.apply {
                     add("blockhash", null)
                     add("block", null)
                 }
-                return
             }
-            throw pluginEx
+
+        } catch (ex: IOException) {
+            plugin.log(PluginLog.WARNING, ex.localizedMessage)
+            throw CLightningPluginException(400, ex.localizedMessage)
         }
     }
 }
