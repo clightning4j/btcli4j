@@ -99,14 +99,20 @@ object HttpRequestFactory {
     fun execRequest(plugin: CLightningPlugin, request: Request): ByteString {
         var response: Response = client.newCall(request).execute()
         var retryTime = 0
-        val result: ByteString
+        var result: ByteString
         while (!isValid(response) && retryTime < 4) {
+            result = response.body!!.byteString()
             plugin.log(PluginLog.ERROR, "During http request to URL ${request.url}")
-            plugin.log(PluginLog.ERROR, "With error message ${request.body}")
+            plugin.log(PluginLog.ERROR, "With error message: ${result.utf8()}")
             plugin.log(PluginLog.ERROR, "retry time ${retryTime}")
+            if(result.utf8().equals("Block not found", true)){
+                //This is need because lightningd continue to require block until the backend respond with null value
+                //This is one cases where the http failure is accepted
+                return result
+            }
+            response.body?.close()
             retryTime++
             Thread.sleep(WAIT_TIME)
-            response.body?.close()
             try {
                 response = client.newCall(request).execute()
             }catch (ex: IOException){
@@ -117,7 +123,6 @@ object HttpRequestFactory {
                     plugin.log(PluginLog.ERROR, "Wait ${WAIT_TIME * 5} (5 minutes) before to retry")
                     // There are too connection to the server and with this code I will wait some time before to died
                     Thread.sleep(WAIT_TIME * 5)
-                    continue
                 }
                 throw ex // If the error isn't caused from timeout error, at this point I can throw the exception
             }
@@ -128,8 +133,7 @@ object HttpRequestFactory {
     }
 
     private fun isValid(response: Response?): Boolean {
-        return response != null && response.isSuccessful &&
-                !response.message.equals("not found", true)
+        return response != null && response.isSuccessful
     }
 
     private fun buildPostRequest(url: String, body: String, mediaType: MediaType): Request {
