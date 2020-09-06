@@ -36,7 +36,7 @@ class GetUtxOutCommand : ICommand {
     private lateinit var network: String
 
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
-        val queryUrl = HttpRequestFactory.buildQueryRL(plugin.getParameter<String>("btcli4j-network"))
+        val queryUrl = HttpRequestFactory.buildQueryRL(plugin.configs.network)
         val txId = request["txid"].asString
         plugin.log(PluginLog.DEBUG, "TxId: $txId")
         val vOut = request["vout"].asInt

@@ -31,12 +31,12 @@ import okio.IOException
  */
 class SendRawTransactionCommand : ICommand {
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
-        val queryUrl = HttpRequestFactory.buildQueryRL(plugin.getParameter<String>("btcli4j-network"))
+        val queryUrl = HttpRequestFactory.buildQueryRL(plugin.configs.network)
 
         val txRaw = request["tx"].asString
         try {
             val reqSendTx = HttpRequestFactory.createRequest("%s/tx".format(queryUrl), type = "post", body = txRaw,
-                    mediaType = "plain/text; charset=utf-8".toMediaType())!!
+                    mediaType = "plain/text".toMediaType())!!
 
             val resSendTx = HttpRequestFactory.execRequest(plugin, reqSendTx).utf8()
 

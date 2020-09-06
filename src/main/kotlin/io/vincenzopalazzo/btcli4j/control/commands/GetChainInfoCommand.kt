@@ -23,6 +23,7 @@ import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.exceptions.CLightningPluginException
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
+import okhttp3.MediaType.Companion.toMediaType
 import okio.IOException
 
 /**
@@ -30,15 +31,17 @@ import okio.IOException
  */
 class GetChainInfoCommand: ICommand {
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
-        val queryUrl = HttpRequestFactory.buildQueryRL(plugin.getParameter<String>("btcli4j-network"))
+        val queryUrl = HttpRequestFactory.buildQueryRL(plugin.configs.network)
         try {
-            val reqGenesisBlock = HttpRequestFactory.createRequest("%s/block-height/0".format(queryUrl))
-            plugin.log(PluginLog.WARNING, reqGenesisBlock!!.url)
+            val reqGenesisBlock = HttpRequestFactory.createRequest("%s/block-height/0".format(queryUrl),
+                    mediaType = "text/plain".toMediaType())
+            plugin.log(PluginLog.WARNING, reqGenesisBlock!!.url.toUrl())
             val genesisBlock: String
             genesisBlock = HttpRequestFactory.execRequest(plugin, reqGenesisBlock).utf8()
             plugin.log(PluginLog.DEBUG, "Genesis block %s".format(genesisBlock))
 
-            val reqBlockchainHeight = HttpRequestFactory.createRequest("%s/blocks/tip/height".format(queryUrl))
+            val reqBlockchainHeight = HttpRequestFactory.createRequest("%s/blocks/tip/height".format(queryUrl),
+                    mediaType = "text/plain".toMediaType())
             val blockCount: Int
             if(reqBlockchainHeight != null){
                 blockCount = HttpRequestFactory.execRequest(plugin, reqBlockchainHeight).utf8().toInt()

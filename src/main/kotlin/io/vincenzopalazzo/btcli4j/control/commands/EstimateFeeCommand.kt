@@ -33,7 +33,7 @@ import java.io.IOException
 class EstimateFeeCommand : ICommand {
 
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
-        val queryUrl = HttpRequestFactory.buildQueryRL(plugin.getParameter<String>("btcli4j-network"))
+        val queryUrl = HttpRequestFactory.buildQueryRL(plugin.configs.network)
 
         try {
             val reqEstimateFee = HttpRequestFactory.createRequest("%s/fee-estimates".format(queryUrl))!!
@@ -59,9 +59,8 @@ class EstimateFeeCommand : ICommand {
                     add("min_acceptable", estimateFee.estimateFeeForSlowTarget().toInt() / 2)
                     add("max_acceptable", estimateFee.estimateFeeForVeryUrgentTarget().toInt() * 10)
                 }
-                plugin.log(PluginLog.WARNING, response)
             } else if (estimateFee.isEmpty()) {
-                plugin.log(PluginLog.ERROR, "Estimate fee empty")
+                plugin.log(PluginLog.DEBUG, "Estimate fee empty")
                 response.apply {
                     add("opening", null)
                     add("mutual_close", null)

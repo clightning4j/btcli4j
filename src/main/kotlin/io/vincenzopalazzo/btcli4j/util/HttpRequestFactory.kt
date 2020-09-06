@@ -18,16 +18,15 @@
  */
 package io.vincenzopalazzo.btcli4j.util
 
-import com.sun.source.util.Plugin
 import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.log.PluginLog
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
-import okio.ByteString
-import okio.IOException
+import okio.*
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.util.concurrent.TimeUnit
+
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -102,6 +101,7 @@ object HttpRequestFactory {
         var result: ByteString
         while (!isValid(response) && retryTime < 4) {
             result = response.body!!.byteString()
+            response.close()
             plugin.log(PluginLog.ERROR, "During http request to URL ${request.url}")
             plugin.log(PluginLog.ERROR, "With error message: ${result.utf8()}")
             plugin.log(PluginLog.ERROR, "retry time ${retryTime}")
@@ -110,25 +110,12 @@ object HttpRequestFactory {
                 //This is one cases where the http failure is accepted
                 return result
             }
-            response.body?.close()
             retryTime++
             Thread.sleep(WAIT_TIME)
-            try {
-                response = client.newCall(request).execute()
-            }catch (ex: IOException){
-                plugin.log(PluginLog.ERROR, "Error during request to URL ${request.url}")
-                plugin.log(PluginLog.ERROR, "Error received is ${ex.localizedMessage}")
-                if(ex.localizedMessage.contains("Connect timed out")){
-                    retryTime-- //Decrease the value, because this value should be happen not very offen
-                    plugin.log(PluginLog.ERROR, "Wait ${WAIT_TIME * 5} (5 minutes) before to retry")
-                    // There are too connection to the server and with this code I will wait some time before to died
-                    Thread.sleep(WAIT_TIME * 5)
-                }
-                throw ex // If the error isn't caused from timeout error, at this point I can throw the exception
-            }
+            response = client.newCall(request).execute()
         }
         result = response.body!!.byteString()
-        response.body?.close()
+        response.close()
         return result
     }
 
@@ -146,8 +133,9 @@ object HttpRequestFactory {
     }
 
     private fun buildGetRequest(url: String): Request {
-        val request = Request.Builder().url(url).build()
+        val request = Request.Builder()
+                .url(url)
+                .build()
         return request
     }
-
 }

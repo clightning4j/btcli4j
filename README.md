@@ -5,9 +5,14 @@ It is a [c-lightning](https://lightning.readthedocs.io/index.html) plugin to ove
 But, this plugin is designed make the process to run c-lightning with bitcoind in pruning mode, the idea of this plugin was
 described inside this [issue by lightningd](https://github.com/lightningd/plugins/issues/112).
 
-The plugin use the mediator patter and each mediator call can use esplora or bitcoind or a both in some cases.
+It is designed with mediator patter and each command inside the mediator can use esplora or bitcoind or a both in some cases.
 
-So, the plugin will support the complete backend with only with esplora and the complete backend only with bitcoind or a join of the two option!
+So, the plugin will support the complete backend with esplora(only) and the complete backend only with bitcoind or a join of the two option!
+
+## Network supported
+
+- [X] Bitcoin (Mainet and Testnet)
+- [X] Liquid
 
 ## Status
 
@@ -31,7 +36,7 @@ The contains only the command to run the jar with java, in my cases the script c
 
 ```bash
 #!/bin/bash
-/usr/lib/jvm/jdk-13.0.2/bin/java -jar /home/vincent/Github/qr-cli/build/libs/qr-cli-all.jar
+/usr/lib/jvm/jdk-13.0.2/bin/java -jar /home/vincent/Github/btcli4j/build/libs/btcli4j-all.jar
 ```
 
 In this case, you can move this bash script inside your `./lightning/plugins` the directory or you can add the plugin to the file conf
@@ -39,13 +44,12 @@ with `plugin=/PATH/bash/file` or use the command line `--plugin=/path/bash/file`
 
 ## Plugin parameter
 
-- btcli4j-network: Indicate the network, by default is testnet, the value accepted are bitcoin, testnet, liquid.
 - btcli4j-proxy: Indicate the proxy address, by default is: "127.0.0.1:9050".
 - btcli4j-proxy-enable: A flag option, it help the user to enable the tor socket, by default is disabled.
 
 An complete example is
 ```bash
-lightningd --btcli4j-proxy-enable --btcli4j-network=liquid
+lightningd --btcli4j-proxy-enable
 ```
 
 The command above, run the lightningd with torv3 on liquid network with esplora backend

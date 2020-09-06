@@ -32,14 +32,6 @@ import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 class Plugin: CLightningPlugin(){
 
     @PluginOption(
-            name = "btcli4j-network",
-            description = "This option give information on the network",
-            defValue = "testnet",
-            typeValue = "string"
-    )
-    private var network: String = "testnet"
-
-    @PluginOption(
             name = "btcli4j-proxy",
             description = "This option give information on proxy enabled, by default set on tor proxy",
             defValue = "127.0.0.1:9050",
@@ -85,7 +77,6 @@ class Plugin: CLightningPlugin(){
 
     private fun configurePluginInit(plugin: CLightningPlugin){
         if(!pluginInit){
-            this.network = plugin.getParameter("btcli4j-network")
             this.proxy = plugin.getParameter("btcli4j-proxy")
             this.proxyEnable = plugin.getParameter("btcli4j-proxy-enable") ?: false
             log(PluginLog.WARNING, "proxy enable: $proxyEnable")

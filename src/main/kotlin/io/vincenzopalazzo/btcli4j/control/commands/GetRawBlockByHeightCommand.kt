@@ -23,6 +23,7 @@ import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.exceptions.CLightningPluginException
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
+import okhttp3.MediaType.Companion.toMediaType
 import okio.IOException
 
 /**
@@ -31,16 +32,19 @@ import okio.IOException
 class GetRawBlockByHeightCommand : ICommand {
 
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
-        val queryUrl = HttpRequestFactory.buildQueryRL(plugin.getParameter<String>("btcli4j-network"))
+        val queryUrl = HttpRequestFactory.buildQueryRL(plugin.configs.network)
         val heightRequest = request["height"].asLong
         try {
-            val blockWithHeight = HttpRequestFactory.createRequest("%s/block-height/%s".format(queryUrl, heightRequest))!!
+            val blockWithHeight = HttpRequestFactory.createRequest("%s/block-height/%s".format(queryUrl, heightRequest),
+                        mediaType = "text/plain".toMediaType())!!
             val resBlockHash = HttpRequestFactory.execRequest(plugin, blockWithHeight).utf8()
 
             plugin.log(PluginLog.DEBUG, "$blockWithHeight Hash $resBlockHash")
             val hexBlock: String
             if (resBlockHash.isNotEmpty() && resBlockHash != "Block not found") {
-                val blockWithHash = HttpRequestFactory.createRequest("%s/block/%s/raw".format(queryUrl, resBlockHash))!!
+                val blockWithHash = HttpRequestFactory.createRequest("%s/block/%s/raw".format(queryUrl, resBlockHash),
+                        mediaType = "text/plain".toMediaType())!!
+                blockWithHash.header("Content-Encoding: gzip")
                 hexBlock = HttpRequestFactory.execRequest(plugin, blockWithHash).hex()
                 response.apply {
                     add("blockhash", resBlockHash)
