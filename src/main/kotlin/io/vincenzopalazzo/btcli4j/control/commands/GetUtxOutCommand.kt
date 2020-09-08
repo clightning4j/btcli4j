@@ -65,7 +65,8 @@ class GetUtxOutCommand : ICommand {
      * On the other hand, if it is not spent I return true to continue and get the transaction information!
      */
     private fun getUTXOInformation(plugin: CLightningPlugin, txId: String, vout: Int, response: CLightningJsonObject): Boolean {
-        val requestUtxo = HttpRequestFactory.createRequest("%s/tx/%s/outspend/%s".format(plugin.configs.network, txId, vout))!!
+        val queryUrl = HttpRequestFactory.buildQueryRL(plugin.configs.network)
+        val requestUtxo = HttpRequestFactory.createRequest("%s/tx/%s/outspend/%s".format(queryUrl, txId, vout))!!
         plugin.log(PluginLog.DEBUG, requestUtxo.url.toUrl().toString())
         val resUtxo = HttpRequestFactory.execRequest(plugin, requestUtxo).utf8()
         if (resUtxo.isNotEmpty() /*&& resUtxo !== "{}"*/) {
