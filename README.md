@@ -49,7 +49,7 @@ with `plugin=/PATH/bash/file` or use the command line `--plugin=/path/bash/file`
 
 An complete example is
 ```bash
-lightningd --btcli4j-proxy-enable
+lightningd --disable-plugin bcli --btcli4j-proxy-enable
 ```
 
 The command above, run the lightningd with torv3 on liquid network with esplora backend

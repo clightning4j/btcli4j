@@ -102,9 +102,9 @@ object HttpRequestFactory {
         while (!isValid(response) && retryTime < 4) {
             result = response.body!!.byteString()
             response.close()
-            plugin.log(PluginLog.ERROR, "During http request to URL ${request.url}")
-            plugin.log(PluginLog.ERROR, "With error message: ${result.utf8()}")
-            plugin.log(PluginLog.ERROR, "retry time ${retryTime}")
+            plugin.log(PluginLog.DEBUG, "During http request to URL ${request.url}")
+            plugin.log(PluginLog.DEBUG, "With error message: ${result.utf8()}")
+            plugin.log(PluginLog.DEBUG, "retry time ${retryTime}")
             if(result.utf8().equals("Block not found", true)){
                 //This is need because lightningd continue to require block until the backend respond with null value
                 //This is one cases where the http failure is accepted
