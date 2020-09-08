@@ -33,8 +33,6 @@ import okio.IOException
  */
 class GetUtxOutCommand : ICommand {
 
-    private lateinit var network: String
-
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
         val queryUrl = HttpRequestFactory.buildQueryRL(plugin.configs.network)
         val txId = request["txid"].asString
@@ -66,7 +64,7 @@ class GetUtxOutCommand : ICommand {
      * On the other hand, if it is not spent I return true to continue and get the transaction information!
      */
     private fun getUTXOInformation(plugin: CLightningPlugin, txId: String, vout: Int, response: CLightningJsonObject): Boolean {
-        val requestUtxo = HttpRequestFactory.createRequest("%s/tx/%s/outspend/%s".format(network, txId, vout))!!
+        val requestUtxo = HttpRequestFactory.createRequest("%s/tx/%s/outspend/%s".format(plugin.configs.network, txId, vout))!!
         val resUtxo = HttpRequestFactory.execRequest(plugin, requestUtxo).utf8()
         if (resUtxo.isNotEmpty() /*&& resUtxo !== "{}"*/) {
             val statusUtxo = JSONConverter.deserialize<StatusUTXOModel>(resUtxo, StatusUTXOModel::class.java)
