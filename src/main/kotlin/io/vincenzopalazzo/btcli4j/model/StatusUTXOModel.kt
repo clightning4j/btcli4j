@@ -23,8 +23,14 @@ package io.vincenzopalazzo.btcli4j.model
  */
 class StatusUTXOModel {
 
-    var spend: String? = null
+    var spend: Boolean = false
         get() = field
 
-    //TODO add field
+    var txid: String? = null
+        get() = field
+
+    var vin: Int? = null
+        get() = field
+
+    var status: StatusOnChain? = null
 }
