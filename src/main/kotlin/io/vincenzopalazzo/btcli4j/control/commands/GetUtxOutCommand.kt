@@ -45,7 +45,6 @@ class GetUtxOutCommand : ICommand {
                 val reqTxInformation = HttpRequestFactory.createRequest("%s/tx/%s".format(queryUrl, txId))!!
                 val resTxInformation = HttpRequestFactory.execRequest(plugin, reqTxInformation).utf8()
                 if (resTxInformation.isNotEmpty() /*&& resTxInformation !== "{}" */) {
-                    plugin.log(PluginLog.DEBUG, reqTxInformation)
                     val transactionInformation = JSONConverter.deserialize<BTCTransactionModel>(resTxInformation, BTCTransactionModel::class.java)
                     val transactionOutput = transactionInformation.transactionsOutput?.get(vOut)!!
                     response.apply {

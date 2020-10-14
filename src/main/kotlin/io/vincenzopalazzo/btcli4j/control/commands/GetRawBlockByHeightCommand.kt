@@ -60,8 +60,8 @@ class GetRawBlockByHeightCommand : ICommand {
             }
 
         } catch (ex: IOException) {
-            plugin.log(PluginLog.WARNING, ex.localizedMessage)
-            throw CLightningPluginException(400, ex.localizedMessage)
+            plugin.log(PluginLog.WARNING, ex.message)
+            throw CLightningPluginException(ex.cause)
         }
     }
 }

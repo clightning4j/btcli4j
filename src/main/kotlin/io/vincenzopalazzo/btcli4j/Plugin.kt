@@ -47,7 +47,15 @@ class Plugin: CLightningPlugin(){
     )
     private var proxyEnable: Boolean = true
 
-    private val pluginInit = false
+    @PluginOption(
+            name = "btcli4j-endpoint",
+            description = "If btcli4j-endpoint is specified the blockstream endpoint will be override with the custom endpoint",
+            defValue = "",
+            typeValue = "string"
+    )
+    private var personalEndPoint: String = "";
+
+    private var pluginInit = false
 
     @RPCMethod(name = "getchaininfo", description = "getchaininfo to fetch the data from blockstream.info")
     fun getChainInfo(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject){
@@ -75,10 +83,14 @@ class Plugin: CLightningPlugin(){
         MediationMethod.runCommand("sendrawtransaction", plugin, CLightningJsonObject(request["params"].asJsonObject), response)
     }
 
+    //TODO configure the personal endpoint propriety!!
     private fun configurePluginInit(plugin: CLightningPlugin){
         if(!pluginInit){
-            this.proxy = plugin.getParameter("btcli4j-proxy")
-            this.proxyEnable = plugin.getParameter("btcli4j-proxy-enable") ?: false
+            pluginInit = true;
+            val proxyIp = plugin.configs.proxy.address
+            val proxyPort = plugin.configs.proxy.port
+            this.proxyEnable = proxyIp.isNotEmpty()
+            this.proxy = "%s:%d".format(proxyIp, proxyPort)
             log(PluginLog.WARNING, "proxy enable: $proxyEnable")
             if(proxyEnable){
                 HttpRequestFactory.configureProxy(this.proxy, true)
