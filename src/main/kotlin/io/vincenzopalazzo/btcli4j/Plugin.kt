@@ -85,8 +85,8 @@ class Plugin: CLightningPlugin(){
 
     //TODO configure the personal endpoint propriety!!
     private fun configurePluginInit(plugin: CLightningPlugin){
-        if(!pluginInit){
-            pluginInit = true;
+        if(!pluginInit && plugin.configs.isProxyEnabled){
+            pluginInit = true
             val proxyIp = plugin.configs.proxy.address
             val proxyPort = plugin.configs.proxy.port
             this.proxyEnable = proxyIp.isNotEmpty()
