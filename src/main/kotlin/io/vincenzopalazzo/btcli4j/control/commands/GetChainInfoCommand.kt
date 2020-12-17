@@ -36,8 +36,7 @@ class GetChainInfoCommand: ICommand {
             val reqGenesisBlock = HttpRequestFactory.createRequest("%s/block-height/0".format(queryUrl),
                     mediaType = "text/plain".toMediaType())
             plugin.log(PluginLog.WARNING, reqGenesisBlock!!.url.toUrl())
-            val genesisBlock: String
-            genesisBlock = HttpRequestFactory.execRequest(plugin, reqGenesisBlock).utf8()
+            val genesisBlock: String = HttpRequestFactory.execRequest(plugin, reqGenesisBlock).utf8()
             plugin.log(PluginLog.DEBUG, "Genesis block %s".format(genesisBlock))
 
             val reqBlockchainHeight = HttpRequestFactory.createRequest("%s/blocks/tip/height".format(queryUrl),
