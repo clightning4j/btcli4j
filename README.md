@@ -1,4 +1,5 @@
 ## Btcli4j
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/clightning4j/btcli4j/Java%20CI?style=for-the-badge)
 
 It is a [c-lightning](https://lightning.readthedocs.io/index.html) plugin to override Bitcoin backend plugin with [esplora](https://github.com/Blockstream/esplora) by [Blockstream](https://blockstream.com/).
 
