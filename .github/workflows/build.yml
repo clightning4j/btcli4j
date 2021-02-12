@@ -12,5 +12,5 @@ jobs:
           java-version: 1.8
       - name: Build with Gradle
         run: |
-        ./gradlew createRunnableScript
-        cat btcli4j-gen.sh
+          ./gradlew createRunnableScript
+          cat btcli4j-gen.sh
