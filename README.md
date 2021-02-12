@@ -1,4 +1,5 @@
 ## Btcli4j
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/clightning4j/btcli4j/Java%20CI?style=for-the-badge)
 
 It is a [c-lightning](https://lightning.readthedocs.io/index.html) plugin to override Bitcoin backend plugin with [esplora](https://github.com/Blockstream/esplora) by [Blockstream](https://blockstream.com/).
 
@@ -7,11 +8,11 @@ described inside this [issue by lightningd](https://github.com/lightningd/plugin
 
 It is designed with mediator patter and each command inside the mediator can use esplora or bitcoind or a both in some cases.
 
-So, the plugin will support the complete backend with esplora(only) and the complete backend only with bitcoind or a join of the two option!
+So, the plugin will support the complete backend with esplora (only) and the complete backend only with bitcoind or a join of the two option!
 
 ## Network supported
 
-- [X] Bitcoin (Mainet and Testnet)
+- [X] Bitcoin (Mainet (Be cautious) and Testnet)
 - [X] Liquid
 
 ## Status
@@ -22,13 +23,13 @@ If you want test it all feedback are welcome! Feel free to open an issue or a PR
 email to [vincenzopalazzodev@gmail.com](mailito://vincenzopalazzodev@gmail.com)
 
 ## Install
-(!! *FOR THE MOMENT* Compatible only with JDK13 because the library [JRPCLightning]() is under developing and is a static jar inside devlib directory!!)
-
 Java produces a jar and c-lightning needs a bash script to run it! 
 The gradle script compiles the plugin and generate a bash script with the command `./gradlew createRunnableScript`
 
-After the gradual process, you have the jar inside the `build/libs/btcli4j-all.jar` and the script `btcli4j-gen.sh` 
+After the gradle process, you have the jar inside the `build/libs/btcli4j-all.jar` and the script `btcli4j-gen.sh` 
 in the root directory of the project.
+
+Now you can put the gradle script inside the c-lightning plugin directory
 
 ### How bash script look like
 

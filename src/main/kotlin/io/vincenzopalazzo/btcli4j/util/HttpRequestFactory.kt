@@ -22,6 +22,7 @@ import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.log.PluginLog
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import okio.*
 import java.net.InetSocketAddress
 import java.net.Proxy
@@ -92,7 +93,9 @@ object HttpRequestFactory {
     }
 
     /**
-     * This method is designed to retry the request 4 time and wait for each error 1 minute
+     * This method is designed to retry the request 4 time and wait an exponential time
+     * this, the wait time is set to 1 minutes by default and the wait time is exponential,
+     * So this mean that the wait time is set to
      */
     @Throws(IOException::class)
     fun execRequest(plugin: CLightningPlugin, request: Request): ByteString {
@@ -104,14 +107,16 @@ object HttpRequestFactory {
             response.close()
             plugin.log(PluginLog.DEBUG, "During http request to URL ${request.url}")
             plugin.log(PluginLog.DEBUG, "With error message: ${result.utf8()}")
-            plugin.log(PluginLog.DEBUG, "retry time ${retryTime}")
-            if(result.utf8().equals("Block not found", true)){
+            plugin.log(PluginLog.DEBUG, "retry time $retryTime")
+            if(result.utf8().contains("Block not found", true)){
                 //This is need because lightningd continue to require block until the backend respond with null value
                 //This is one cases where the http failure is accepted
                 return result
             }
             retryTime++
-            Thread.sleep(WAIT_TIME)
+            val exponentialRetryTime = WAIT_TIME * retryTime
+            plugin.log(PluginLog.DEBUG, "Error occurs %d time: and the waiting time is set to %d".format(retryTime, exponentialRetryTime))
+            Thread.sleep(exponentialRetryTime)
             response = client.newCall(request).execute()
         }
         result = response.body!!.byteString()
@@ -124,18 +129,16 @@ object HttpRequestFactory {
     }
 
     private fun buildPostRequest(url: String, body: String, mediaType: MediaType): Request {
-        val requestBody = RequestBody.create(mediaType, body)
-        val request = Request.Builder()
-                .url(url)
-                .post(requestBody)
-                .build()
-        return request
+        val requestBody = body.toRequestBody(mediaType)
+        return Request.Builder()
+            .url(url)
+            .post(requestBody)
+            .build()
     }
 
     private fun buildGetRequest(url: String): Request {
-        val request = Request.Builder()
-                .url(url)
-                .build()
-        return request
+        return Request.Builder()
+            .url(url)
+            .build()
     }
 }

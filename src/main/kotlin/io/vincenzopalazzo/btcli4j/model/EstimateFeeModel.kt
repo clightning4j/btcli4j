@@ -24,7 +24,6 @@ package io.vincenzopalazzo.btcli4j.model
 class EstimateFeeModel {
 
     val mapEstimationFee = HashMap<Int, Double>()
-        get() = field
 
     fun putValue(key: Int, value: Double){
         mapEstimationFee.put(key, value)
