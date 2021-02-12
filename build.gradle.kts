@@ -13,12 +13,13 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("com.squareup.okhttp3:okhttp:4.8.1")
-    //implementation("io.github.clightning4j:jrpclightning:0.1.8")
+    implementation("io.github.clightning4j:jrpclightning:0.1.8")
 
+    /*
     //Developing library
     api(fileTree("${project.projectDir}/devlib") {
         include("jrpclightning-0.1.9-SNAPSHOT-with-dependencies.jar")
-    })
+    }) */
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 }

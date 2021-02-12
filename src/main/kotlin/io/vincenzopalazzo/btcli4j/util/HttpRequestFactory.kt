@@ -107,7 +107,7 @@ object HttpRequestFactory {
             response.close()
             plugin.log(PluginLog.DEBUG, "During http request to URL ${request.url}")
             plugin.log(PluginLog.DEBUG, "With error message: ${result.utf8()}")
-            plugin.log(PluginLog.DEBUG, "retry time ${retryTime}")
+            plugin.log(PluginLog.DEBUG, "retry time $retryTime")
             if(result.utf8().contains("Block not found", true)){
                 //This is need because lightningd continue to require block until the backend respond with null value
                 //This is one cases where the http failure is accepted
@@ -130,17 +130,15 @@ object HttpRequestFactory {
 
     private fun buildPostRequest(url: String, body: String, mediaType: MediaType): Request {
         val requestBody = body.toRequestBody(mediaType)
-        val request = Request.Builder()
-                .url(url)
-                .post(requestBody)
-                .build()
-        return request
+        return Request.Builder()
+            .url(url)
+            .post(requestBody)
+            .build()
     }
 
     private fun buildGetRequest(url: String): Request {
-        val request = Request.Builder()
-                .url(url)
-                .build()
-        return request
+        return Request.Builder()
+            .url(url)
+            .build()
     }
 }
