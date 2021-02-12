@@ -22,13 +22,13 @@ If you want test it all feedback are welcome! Feel free to open an issue or a PR
 email to [vincenzopalazzodev@gmail.com](mailito://vincenzopalazzodev@gmail.com)
 
 ## Install
-(!! *FOR THE MOMENT* Compatible only with JDK13 because the library [JRPCLightning]() is under developing and is a static jar inside devlib directory!!)
-
 Java produces a jar and c-lightning needs a bash script to run it! 
 The gradle script compiles the plugin and generate a bash script with the command `./gradlew createRunnableScript`
 
-After the gradual process, you have the jar inside the `build/libs/btcli4j-all.jar` and the script `btcli4j-gen.sh` 
+After the gradle process, you have the jar inside the `build/libs/btcli4j-all.jar` and the script `btcli4j-gen.sh` 
 in the root directory of the project.
+
+Now you can put the gradle script inside the c-lightning plugin directory
 
 ### How bash script look like
 
