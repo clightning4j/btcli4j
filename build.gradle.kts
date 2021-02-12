@@ -1,6 +1,5 @@
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.4.30"
-
     application
 }
 
@@ -14,7 +13,6 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("com.squareup.okhttp3:okhttp:4.8.1")
     implementation("io.github.clightning4j:jrpclightning:0.1.8")
-
     /*
     //Developing library
     api(fileTree("${project.projectDir}/devlib") {
@@ -33,7 +31,7 @@ tasks {
         archiveClassifier.set("all")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         manifest {
-            attributes("Main-Class" to application.mainClassName)
+            attributes("Main-Class" to application.mainClass)
         }
         from(configurations.runtimeClasspath.get()
                 .onEach { println("add from dependencies: ${it.name}") }
