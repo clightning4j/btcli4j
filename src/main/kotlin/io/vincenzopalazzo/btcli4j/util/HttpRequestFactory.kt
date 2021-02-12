@@ -22,6 +22,7 @@ import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.log.PluginLog
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import okio.*
 import java.net.InetSocketAddress
 import java.net.Proxy
@@ -124,7 +125,7 @@ object HttpRequestFactory {
     }
 
     private fun buildPostRequest(url: String, body: String, mediaType: MediaType): Request {
-        val requestBody = RequestBody.create(mediaType, body)
+        val requestBody = body.toRequestBody(mediaType)
         val request = Request.Builder()
                 .url(url)
                 .post(requestBody)

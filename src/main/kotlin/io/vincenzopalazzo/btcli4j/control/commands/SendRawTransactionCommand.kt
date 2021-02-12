@@ -42,7 +42,7 @@ class SendRawTransactionCommand : ICommand {
 
             response.apply {
                 add("success", resSendTx.isNotEmpty()) // TODO validate if it is a txId
-                add("errmsg", resSendTx.isNotEmpty() ?: "Invalid tx") // check this code
+                add("errmsg", resSendTx.isNotEmpty()) // check this code
             }
         } catch (ex: IOException) {
             plugin.log(PluginLog.WARNING, ex.localizedMessage)

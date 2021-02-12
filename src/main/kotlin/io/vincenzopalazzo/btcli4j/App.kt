@@ -1,6 +1,6 @@
 /**
  *  C-lightning plugin to override Bitcoin backend plugin.
- *  Copyright (C) 2020 Vincenzo Palazzo vincenzopalazzodev@gmail.com
+ *  Copyright (C) 2020-2021 Vincenzo Palazzo vincenzopalazzodev@gmail.com
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ package io.vincenzopalazzo.btcli4j
 /**
  * @author https://github.com/vincenzopalazzo
  */
-fun main(args: Array<String>) {
+fun main() {
     val btcCli4j = Plugin()
     btcCli4j.start()
 }
