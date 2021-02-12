@@ -7,11 +7,11 @@ described inside this [issue by lightningd](https://github.com/lightningd/plugin
 
 It is designed with mediator patter and each command inside the mediator can use esplora or bitcoind or a both in some cases.
 
-So, the plugin will support the complete backend with esplora(only) and the complete backend only with bitcoind or a join of the two option!
+So, the plugin will support the complete backend with esplora (only) and the complete backend only with bitcoind or a join of the two option!
 
 ## Network supported
 
-- [X] Bitcoin (Mainet and Testnet)
+- [X] Bitcoin (Mainet (Be cautious) and Testnet)
 - [X] Liquid
 
 ## Status
