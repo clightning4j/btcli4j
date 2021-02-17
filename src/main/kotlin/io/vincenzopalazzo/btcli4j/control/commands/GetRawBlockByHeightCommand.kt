@@ -35,22 +35,25 @@ class GetRawBlockByHeightCommand : ICommand {
         val queryUrl = HttpRequestFactory.buildQueryRL(plugin.configs.network)
         val heightRequest = request["height"].asLong
         try {
-            val blockWithHeight = HttpRequestFactory.createRequest("%s/block-height/%s".format(queryUrl, heightRequest),
-                        mediaType = "text/plain".toMediaType())!!
+            val blockWithHeight = HttpRequestFactory.createRequest(
+                "%s/block-height/%s".format(queryUrl, heightRequest),
+                mediaType = "text/plain".toMediaType()
+            )!!
             val resBlockHash = HttpRequestFactory.execRequest(plugin, blockWithHeight).utf8()
-
             plugin.log(PluginLog.DEBUG, "$blockWithHeight Hash $resBlockHash")
             val hexBlock: String
             if (resBlockHash.isNotEmpty() && resBlockHash != "Block not found") {
-                val blockWithHash = HttpRequestFactory.createRequest("%s/block/%s/raw".format(queryUrl, resBlockHash),
-                        mediaType = "text/plain".toMediaType())!!
+                val blockWithHash = HttpRequestFactory.createRequest(
+                    "%s/block/%s/raw".format(queryUrl, resBlockHash),
+                    mediaType = "text/plain".toMediaType()
+                )!!
                 blockWithHash.header("Content-Encoding: gzip")
                 hexBlock = HttpRequestFactory.execRequest(plugin, blockWithHash).hex()
                 response.apply {
                     add("blockhash", resBlockHash)
                     add("block", hexBlock)
                 }
-            }else{
+            } else {
                 //Lightningd continue to require bitcoin block and it know that the block is the last
                 //only if it receive the object with null proprieties
                 response.apply {

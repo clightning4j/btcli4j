@@ -9,9 +9,12 @@ repositories {
 
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.9.1"))
+
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.google.code.gson:gson:2.8.6")
-    implementation("com.squareup.okhttp3:okhttp:4.8.1")
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor")
     implementation("io.github.clightning4j:jrpclightning:0.1.8")
     /*
     //Developing library
@@ -23,7 +26,7 @@ dependencies {
 }
 
 application {
-    mainClassName = "io.vincenzopalazzo.btcli4j.AppKt"
+    mainClass.set("io.vincenzopalazzo.btcli4j.AppKt")
 }
 
 tasks {

@@ -96,6 +96,9 @@ object HttpRequestFactory {
      * This method is designed to retry the request 4 time and wait an exponential time
      * this, the wait time is set to 1 minutes by default and the wait time is exponential,
      * So this mean that the wait time is set to
+     *
+     * // TODO: this method should be manage better the exception because the INTERNAL ERROR should be recovederd from
+     * // here. I don't need to throws an exception to the side of plugin.
      */
     @Throws(IOException::class)
     fun execRequest(plugin: CLightningPlugin, request: Request): ByteString {
