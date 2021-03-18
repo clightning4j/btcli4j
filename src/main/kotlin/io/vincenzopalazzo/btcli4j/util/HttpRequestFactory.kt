@@ -96,9 +96,6 @@ object HttpRequestFactory {
      * This method is designed to retry the request 4 time and wait an exponential time
      * this, the wait time is set to 1 minutes by default and the wait time is exponential,
      * So this mean that the wait time is set to
-     *
-     * // TODO: this method should be manage better the exception because the INTERNAL ERROR should be recovederd from
-     * // here. I don't need to throws an exception to the side of plugin.
      */
     @Throws(Exception::class)
     fun execRequest(plugin: CLightningPlugin, request: Request): ByteString {
@@ -115,8 +112,6 @@ object HttpRequestFactory {
                     // This is need because lightningd continue to require block until the backend respond with null value
                     // This is one cases where the http failure is accepted
                     return result
-                } else if (result.utf8().contains("Transaction already in block chain", true)) {
-                    throw Exception("Transaction already in block chain")
                 }
                 if (!isValid(response)) {
                     retryTime++
