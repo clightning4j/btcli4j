@@ -1,10 +1,12 @@
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.4.30"
+    id("org.jmailen.kotlinter") version "3.3.0"
     application
 }
 
 repositories {
     jcenter()
+    mavenCentral()
 }
 
 dependencies {
@@ -36,9 +38,11 @@ tasks {
         manifest {
             attributes("Main-Class" to application.mainClass)
         }
-        from(configurations.runtimeClasspath.get()
+        from(
+            configurations.runtimeClasspath.get()
                 .onEach { println("add from dependencies: ${it.name}") }
-                .map { if (it.isDirectory) it else zipTree(it) })
+                .map { if (it.isDirectory) it else zipTree(it) }
+        )
         val sourcesMain = sourceSets.main.get()
         sourcesMain.allSource.forEach { println("add from sources: ${it.name}") }
         from(sourcesMain.output)
@@ -46,12 +50,14 @@ tasks {
 
     register("createRunnableScript") {
         dependsOn("fatJar")
-        file("${projectDir}/${project.name}-gen.sh").createNewFile()
-        file("${projectDir}/${project.name}-gen.sh").writeText(
-                """
+        file("$projectDir/${project.name}-gen.sh").createNewFile()
+        file("$projectDir/${project.name}-gen.sh").writeText(
+            """
                 # Script generated from gradle! By clightning4j
                 #!/bin/bash
                 ${System.getProperties().getProperty("java.home")}/bin/java -jar ${project.buildDir.absolutePath}/libs/${project.name}-all.jar
-                """.trimIndent())
+            """.trimIndent()
+        )
     }
 }
+

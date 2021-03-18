@@ -18,7 +18,12 @@
  */
 package io.vincenzopalazzo.btcli4j.control
 
-import io.vincenzopalazzo.btcli4j.control.commands.*
+import io.vincenzopalazzo.btcli4j.control.commands.EstimateFeeCommand
+import io.vincenzopalazzo.btcli4j.control.commands.GetChainInfoCommand
+import io.vincenzopalazzo.btcli4j.control.commands.GetRawBlockByHeightCommand
+import io.vincenzopalazzo.btcli4j.control.commands.GetUtxOutCommand
+import io.vincenzopalazzo.btcli4j.control.commands.ICommand
+import io.vincenzopalazzo.btcli4j.control.commands.SendRawTransactionCommand
 import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 
@@ -39,8 +44,8 @@ object MediationMethod {
         }
     }
 
-    fun runCommand(key: String, plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject){
-        if(commands.containsKey(key)){
+    fun runCommand(key: String, plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
+        if (commands.containsKey(key)) {
             commands.getValue(key).run(plugin, request, response)
         }
     }

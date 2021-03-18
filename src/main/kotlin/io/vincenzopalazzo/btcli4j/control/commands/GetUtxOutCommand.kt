@@ -41,11 +41,14 @@ class GetUtxOutCommand : ICommand {
         plugin.log(PluginLog.DEBUG, "Vout: $vOut")
         try {
             if (getUTXOInformation(plugin, txId, vOut, response)) {
-                //The transaction wasn't spent!!
+                // The transaction wasn't spent!!
                 val reqTxInformation = HttpRequestFactory.createRequest("%s/tx/%s".format(queryUrl, txId))!!
                 val resTxInformation = HttpRequestFactory.execRequest(plugin, reqTxInformation).utf8()
                 if (resTxInformation.isNotEmpty() /*&& resTxInformation !== "{}" */) {
-                    val transactionInformation = JSONConverter.deserialize<BTCTransactionModel>(resTxInformation, BTCTransactionModel::class.java)
+                    val transactionInformation = JSONConverter.deserialize<BTCTransactionModel>(
+                        resTxInformation,
+                        BTCTransactionModel::class.java
+                    )
                     val transactionOutput = transactionInformation.transactionsOutput?.get(vOut)!!
                     response.apply {
                         add("amount", transactionOutput.value)
@@ -63,7 +66,12 @@ class GetUtxOutCommand : ICommand {
      * Function to verify if transaction have a status valid, if it is spent I will return false and the transaction will be not verify.
      * On the other hand, if it is not spent I return true to continue and get the transaction information!
      */
-    private fun getUTXOInformation(plugin: CLightningPlugin, txId: String, vout: Int, response: CLightningJsonObject): Boolean {
+    private fun getUTXOInformation(
+        plugin: CLightningPlugin,
+        txId: String,
+        vout: Int,
+        response: CLightningJsonObject
+    ): Boolean {
         val queryUrl = HttpRequestFactory.buildQueryRL(plugin.configs.network)
         val requestUtxo = HttpRequestFactory.createRequest("%s/tx/%s/outspend/%s".format(queryUrl, txId, vout))!!
         val resUtxo = HttpRequestFactory.execRequest(plugin, requestUtxo).utf8()
@@ -80,7 +88,7 @@ class GetUtxOutCommand : ICommand {
                 }
                 return false
             }
-            return true //continue
+            return true // continue
         }
         response.apply {
             add("amount", null)
@@ -88,5 +96,4 @@ class GetUtxOutCommand : ICommand {
         }
         return false
     }
-
 }

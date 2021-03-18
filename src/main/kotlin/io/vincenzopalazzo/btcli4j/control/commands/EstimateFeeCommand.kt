@@ -21,11 +21,11 @@ package io.vincenzopalazzo.btcli4j.control.commands
 import io.vincenzopalazzo.btcli4j.model.EstimateFeeModel
 import io.vincenzopalazzo.btcli4j.util.HttpRequestFactory
 import io.vincenzopalazzo.btcli4j.util.JSONConverter
+import java.io.IOException
 import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.exceptions.CLightningPluginException
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
-import java.io.IOException
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -77,5 +77,4 @@ class EstimateFeeCommand : ICommand {
             throw CLightningPluginException(400, ex.localizedMessage)
         }
     }
-
 }

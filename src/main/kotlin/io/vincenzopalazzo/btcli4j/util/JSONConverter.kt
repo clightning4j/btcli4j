@@ -18,12 +18,10 @@
  */
 package io.vincenzopalazzo.btcli4j.util
 
-import com.google.gson.*
-import com.google.gson.reflect.TypeToken
+import com.google.gson.GsonBuilder
 import io.vincenzopalazzo.btcli4j.model.EstimateFeeModel
 import io.vincenzopalazzo.btcli4j.util.typeadapter.EstimateFeeTypeAdapter
 import java.lang.reflect.Type
-import java.math.BigDecimal
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -39,19 +37,16 @@ object JSONConverter {
 
     private val gson = gsonBuilder.create()
 
-
     fun serialize(obj: Any): String? {
         return gson.toJson(obj)
     }
 
     fun <T> deserialize(fromString: String, responseType: Type): T {
-         try {
-             return gson.fromJson(fromString, responseType)
+        try {
+            return gson.fromJson(fromString, responseType)
         } catch (ex: Exception) {
             ex.printStackTrace()
             throw RuntimeException(ex.cause)
         }
     }
-
-
 }

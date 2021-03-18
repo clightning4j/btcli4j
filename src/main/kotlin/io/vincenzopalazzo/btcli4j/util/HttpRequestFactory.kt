@@ -18,16 +18,18 @@
  */
 package io.vincenzopalazzo.btcli4j.util
 
-import jrpc.clightning.plugins.CLightningPlugin
-import jrpc.clightning.plugins.log.PluginLog
-import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
-import okio.*
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.util.concurrent.TimeUnit
-
+import jrpc.clightning.plugins.CLightningPlugin
+import jrpc.clightning.plugins.log.PluginLog
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import okio.ByteString
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -71,7 +73,9 @@ object HttpRequestFactory {
     }
 
     fun createRequest(
-        url: String, type: String = "get", body: String = "",
+        url: String,
+        type: String = "get",
+        body: String = "",
         mediaType: MediaType = "application/json; charset=utf-8".toMediaType(),
         torVersion: Int = 3
     ): Request? {
@@ -96,11 +100,11 @@ object HttpRequestFactory {
      * // TODO: this method should be manage better the exception because the INTERNAL ERROR should be recovederd from
      * // here. I don't need to throws an exception to the side of plugin.
      */
-    @Throws(IOException::class)
+    @Throws(Exception::class)
     fun execRequest(plugin: CLightningPlugin, request: Request): ByteString {
-        val response = makeRequest(request)
+        var response = makeRequest(request)
         var retryTime = 0
-        while(!isValid(response) && retryTime <= 4) {
+        while (!isValid(response) && retryTime <= 4) {
             try {
                 val result = response.body!!.byteString()
                 plugin.log(PluginLog.DEBUG, "During http request to URL ${request.url}")
@@ -108,12 +112,15 @@ object HttpRequestFactory {
                 plugin.log(PluginLog.DEBUG, "retry time $retryTime")
                 plugin.log(PluginLog.WARNING, "Response from server: %s".format(result.utf8()))
                 if (result.utf8().contains("Block not found", true)) {
-                    //This is need because lightningd continue to require block until the backend respond with null value
-                    //This is one cases where the http failure is accepted
+                    // This is need because lightningd continue to require block until the backend respond with null value
+                    // This is one cases where the http failure is accepted
                     return result
+                } else if (result.utf8().contains("Transaction already in block chain", true)) {
+                    throw Exception("Transaction already in block chain")
                 }
                 if (!isValid(response)) {
                     retryTime++
+                    response = makeRequest(request)
                     continue
                 }
                 return result
@@ -129,11 +136,12 @@ object HttpRequestFactory {
                 )
                 Thread.sleep(exponentialRetryTime)
                 retryTime++
+                response = makeRequest(request)
             } finally {
                 response.close()
             }
         }
-        if(isValid(response)) {
+        if (isValid(response)) {
             return response.body!!.byteString()
         }
         throw Exception("Error generate from Bitcoin backend more than 4 time")
