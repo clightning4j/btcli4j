@@ -1,7 +1,9 @@
 ## Btcli4j
+
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/clightning4j/btcli4j/Java%20CI?style=for-the-badge)
 
-It is a [c-lightning](https://lightning.readthedocs.io/index.html) plugin to override Bitcoin backend plugin with [esplora](https://github.com/Blockstream/esplora) by [Blockstream](https://blockstream.com/).
+It is a [c-lightning](https://lightning.readthedocs.io/index.html) plugin to override Bitcoin backend plugin with [esplora](https://github.com/Blockstream/esplora) 
+powered by [Blockstream](https://blockstream.com/).
 
 But this plugin is designed make the process to run c-lightning with bitcoind in pruning mode, the idea of this plugin was
 described inside this [issue by lightningd](https://github.com/lightningd/plugins/issues/112).
@@ -46,15 +48,18 @@ with `plugin=/PATH/bash/file` or use the command line `--plugin=/path/bash/file`
 ## Plugin parameter
 
 - btcli4j-proxy: Indicate the proxy address, by default is: "127.0.0.1:9050".
-- btcli4j-proxy-enable: A flag option, it help the user to enable the tor socket, by default is disabled.
+- btcli4j-proxy-enable: A flag option, it help the user to enable the tor socket, by default it is used the same configuration of c-lightning.
 
 A complete example is
 
 ```bash
-lightningd --disable-plugin bcli --btcli4j-proxy-enable
+lightningd --disable-plugin bcli
 ```
 
-The command above, run the lightningd with torv3 on liquid network with esplora backend
+The command above, run the lightningd with the lightnind configuration, this mean that you don't need to add some 
+additional configuration to the command line.
+
+However, you can use the command line to customize the plugin behaviors.
 
 ## Code Style
 [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/)
