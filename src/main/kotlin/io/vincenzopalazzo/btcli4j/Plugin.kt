@@ -29,70 +29,70 @@ import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 /**
  * @author https://github.com/vincenzopalazzo
  */
-class Plugin: CLightningPlugin(){
+class Plugin : CLightningPlugin() {
 
     @PluginOption(
-            name = "btcli4j-proxy",
-            description = "This option give information on proxy enabled, by default set on tor proxy",
-            defValue = "127.0.0.1:9050",
-            typeValue = "string"
+        name = "btcli4j-proxy",
+        description = "This option give information on proxy enabled, by default set on tor proxy",
+        defValue = "127.0.0.1:9050",
+        typeValue = "string"
     )
     private var proxy: String = "127.0.0.1:9050"
 
     @PluginOption(
-            name = "btcli4j-proxy-enable",
-            description = "This option give enable the proxy inside plugin. By default is true",
-            defValue = "true",
-            typeValue = "flag"
+        name = "btcli4j-proxy-enable",
+        description = "This option give enable the proxy inside plugin. By default is true",
+        defValue = "true",
+        typeValue = "flag"
     )
     private var proxyEnable: Boolean = true
 
     @PluginOption(
-            name = "btcli4j-endpoint",
-            description = "If btcli4j-endpoint is specified the blockstream endpoint will be override with the custom endpoint",
-            defValue = "",
-            typeValue = "string"
+        name = "btcli4j-endpoint",
+        description = "If btcli4j-endpoint is specified the blockstream endpoint will be override with the custom endpoint",
+        defValue = "",
+        typeValue = "string"
     )
     private var personalEndPoint: String = ""
 
     private var pluginInit = false
 
     @RPCMethod(name = "getchaininfo", description = "getchaininfo to fetch the data from blockstream.info")
-    fun getChainInfo(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject){
+    fun getChainInfo(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
         this.configurePluginInit(plugin)
         MediationMethod.runCommand("getchaininfo", plugin, CLightningJsonObject(request["params"].asJsonObject), response)
     }
 
     @RPCMethod(name = "estimatefees", description = "estimatefees to fetch the feed estimation from blockstream.info")
-    fun estimateFees(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject){
+    fun estimateFees(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
         MediationMethod.runCommand("estimatefees", plugin, CLightningJsonObject(request["params"].asJsonObject), response)
     }
 
     @RPCMethod(name = "getrawblockbyheight", description = "getrawblockbyheight to fetch actual blockchain height from blockstream.info")
-    fun getRawBlockByHeight(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject){
+    fun getRawBlockByHeight(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
         MediationMethod.runCommand("getrawblockbyheight", plugin, CLightningJsonObject(request["params"].asJsonObject), response)
     }
 
     @RPCMethod(name = "getutxout", description = "getutxout to fetch a utx with {txid} and {vout} from blockstream.info")
-    fun getUtxOut(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject){
+    fun getUtxOut(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
         MediationMethod.runCommand("getutxout", plugin, CLightningJsonObject(request["params"].asJsonObject), response)
     }
 
     @RPCMethod(name = "sendrawtransaction", description = "sendrawtransaction to publish a new transaction with blockstream.info")
-    fun sendRawTransaction(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject){
+    fun sendRawTransaction(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
         MediationMethod.runCommand("sendrawtransaction", plugin, CLightningJsonObject(request["params"].asJsonObject), response)
     }
 
-    //TODO configure the personal endpoint propriety!!
-    private fun configurePluginInit(plugin: CLightningPlugin){
-        if(!pluginInit && plugin.configs.isProxyEnabled){
+    // TODO configure the personal endpoint propriety!!
+    private fun configurePluginInit(plugin: CLightningPlugin) {
+        if (!pluginInit && plugin.configs.isProxyEnabled) {
             pluginInit = true
             val proxyIp = plugin.configs.proxy.address
             val proxyPort = plugin.configs.proxy.port
             this.proxyEnable = proxyIp.isNotEmpty()
             this.proxy = "%s:%d".format(proxyIp, proxyPort)
             log(PluginLog.WARNING, "proxy enable: $proxyEnable")
-            if(proxyEnable){
+            if (proxyEnable) {
                 HttpRequestFactory.configureProxy(this.proxy, true)
                 log(PluginLog.INFO, "Tor proxy enabled on btcli4j")
             }

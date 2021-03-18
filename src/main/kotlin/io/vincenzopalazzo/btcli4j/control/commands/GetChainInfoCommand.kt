@@ -29,29 +29,33 @@ import okio.IOException
 /**
  * @author https://github.com/vincenzopalazzo
  */
-class GetChainInfoCommand: ICommand {
+class GetChainInfoCommand : ICommand {
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
         val queryUrl = HttpRequestFactory.buildQueryRL(plugin.configs.network)
         try {
-            val reqGenesisBlock = HttpRequestFactory.createRequest("%s/block-height/0".format(queryUrl),
-                    mediaType = "text/plain".toMediaType())
+            val reqGenesisBlock = HttpRequestFactory.createRequest(
+                "%s/block-height/0".format(queryUrl),
+                mediaType = "text/plain".toMediaType()
+            )
             plugin.log(PluginLog.WARNING, reqGenesisBlock!!.url.toUrl())
             val genesisBlock: String = HttpRequestFactory.execRequest(plugin, reqGenesisBlock).utf8()
             plugin.log(PluginLog.DEBUG, "Genesis block %s".format(genesisBlock))
 
-            val reqBlockchainHeight = HttpRequestFactory.createRequest("%s/blocks/tip/height".format(queryUrl),
-                    mediaType = "text/plain".toMediaType())
+            val reqBlockchainHeight = HttpRequestFactory.createRequest(
+                "%s/blocks/tip/height".format(queryUrl),
+                mediaType = "text/plain".toMediaType()
+            )
             val blockCount: Int
-            if(reqBlockchainHeight != null){
+            if (reqBlockchainHeight != null) {
                 blockCount = HttpRequestFactory.execRequest(plugin, reqBlockchainHeight).utf8().toInt()
                 plugin.log(PluginLog.DEBUG, "Block count = %s".format(blockCount.toString()))
-            }else{
+            } else {
                 plugin.log(PluginLog.ERROR, "Request for genesis block null!!!")
                 throw CLightningPluginException(400, "Request for genesis block null!!!")
             }
 
-            var chain = "" //TODO refactoring this inside a new lib tools :-)
-            when(genesisBlock){
+            var chain = "" // TODO refactoring this inside a new lib tools :-)
+            when (genesisBlock) {
                 "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f" -> chain = "main"
                 "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943" -> chain = "test"
                 "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206" -> chain = "regtest"
@@ -64,10 +68,9 @@ class GetChainInfoCommand: ICommand {
                 add("blockcount", blockCount)
                 add("ibd", false)
             }
-        }catch (ex: IOException){
+        } catch (ex: IOException) {
             plugin.log(PluginLog.WARNING, ex.localizedMessage)
             throw CLightningPluginException(400, ex.localizedMessage)
         }
-
     }
 }

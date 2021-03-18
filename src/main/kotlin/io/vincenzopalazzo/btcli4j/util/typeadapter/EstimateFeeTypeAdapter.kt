@@ -12,7 +12,7 @@ class EstimateFeeTypeAdapter : TypeAdapter<EstimateFeeModel>() {
     override fun write(jsonWriter: JsonWriter, obj: EstimateFeeModel) {
         jsonWriter.beginObject()
 
-        obj.mapEstimationFee.forEach{
+        obj.mapEstimationFee.forEach {
             jsonWriter.name(it.key.toString())
             jsonWriter.value(BigDecimal.valueOf(it.value))
         }
@@ -25,9 +25,9 @@ class EstimateFeeTypeAdapter : TypeAdapter<EstimateFeeModel>() {
         while (jsonReader.hasNext()) {
             var token = jsonReader.peek()
             val key: Int
-            if(token == JsonToken.NAME){
+            if (token == JsonToken.NAME) {
                 key = jsonReader.nextName().toInt()
-                //move to next token
+                // move to next token
                 token = jsonReader.peek()
                 feerate.putValue(key, BigDecimal.valueOf(jsonReader.nextDouble() * 100).toDouble())
             }

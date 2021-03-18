@@ -35,8 +35,10 @@ class SendRawTransactionCommand : ICommand {
 
         val txRaw = request["tx"].asString
         try {
-            val reqSendTx = HttpRequestFactory.createRequest("%s/tx".format(queryUrl), type = "post", body = txRaw,
-                    mediaType = "plain/text".toMediaType())!!
+            val reqSendTx = HttpRequestFactory.createRequest(
+                "%s/tx".format(queryUrl), type = "post", body = txRaw,
+                mediaType = "plain/text".toMediaType()
+            )!!
 
             val resSendTx = HttpRequestFactory.execRequest(plugin, reqSendTx).utf8()
 
@@ -49,5 +51,4 @@ class SendRawTransactionCommand : ICommand {
             throw CLightningPluginException(400, ex.localizedMessage)
         }
     }
-
 }

@@ -10,6 +10,9 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+      - name: Check Kotling format
+        run: |
+          ./gradlew lintKotlin
       - name: Build with Gradle
         run: |
           ./gradlew createRunnableScript

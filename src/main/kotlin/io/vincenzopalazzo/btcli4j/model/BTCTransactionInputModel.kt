@@ -24,7 +24,7 @@ import com.google.gson.annotations.SerializedName
 /**
  * @author https://github.com/vincenzopalazzo
  */
-class BTCTransactionInputModel{
+class BTCTransactionInputModel {
 
     @SerializedName("txid")
     val txId: String? = null

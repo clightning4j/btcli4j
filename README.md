@@ -3,7 +3,7 @@
 
 It is a [c-lightning](https://lightning.readthedocs.io/index.html) plugin to override Bitcoin backend plugin with [esplora](https://github.com/Blockstream/esplora) by [Blockstream](https://blockstream.com/).
 
-But, this plugin is designed make the process to run c-lightning with bitcoind in pruning mode, the idea of this plugin was
+But this plugin is designed make the process to run c-lightning with bitcoind in pruning mode, the idea of this plugin was
 described inside this [issue by lightningd](https://github.com/lightningd/plugins/issues/112).
 
 It is designed with mediator patter and each command inside the mediator can use esplora or bitcoind or a both in some cases.
@@ -48,12 +48,25 @@ with `plugin=/PATH/bash/file` or use the command line `--plugin=/path/bash/file`
 - btcli4j-proxy: Indicate the proxy address, by default is: "127.0.0.1:9050".
 - btcli4j-proxy-enable: A flag option, it help the user to enable the tor socket, by default is disabled.
 
-An complete example is
+A complete example is
+
 ```bash
 lightningd --disable-plugin bcli --btcli4j-proxy-enable
 ```
 
 The command above, run the lightningd with torv3 on liquid network with esplora backend
+
+## Code Style
+[![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/)
+
+> We live in a world where robots can drive a car, so we shouldn't just write code, we should write elegant code.
+
+This repository use [ktlint](https://github.com/pinterest/ktlint) to maintains the code of the repository elegant, so 
+before submit the code check the Kotlin format with the following command on the root of the directory
+
+```bash
+./gradlew formatKotlin
+```
 
 ## Built with
 

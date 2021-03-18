@@ -54,14 +54,13 @@ class GetRawBlockByHeightCommand : ICommand {
                     add("block", hexBlock)
                 }
             } else {
-                //Lightningd continue to require bitcoin block and it know that the block is the last
-                //only if it receive the object with null proprieties
+                // Lightningd continue to require bitcoin block and it know that the block is the last
+                // only if it receive the object with null proprieties
                 response.apply {
                     add("blockhash", null)
                     add("block", null)
                 }
             }
-
         } catch (ex: IOException) {
             plugin.log(PluginLog.WARNING, ex.message)
             throw CLightningPluginException(ex.cause)
