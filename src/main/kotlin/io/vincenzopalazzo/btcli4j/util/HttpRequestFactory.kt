@@ -18,6 +18,7 @@
  */
 package io.vincenzopalazzo.btcli4j.util
 
+import io.vincenzopalazzo.btcli4j.control.checkchain.ChainOfResponsibilityCheck
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.util.concurrent.TimeUnit
@@ -42,6 +43,7 @@ object HttpRequestFactory {
     private const val WAIT_TIME: Long = 60000
 
     private var proxyEnabled: Boolean = false
+    private var checkChains = ChainOfResponsibilityCheck()
     private var client = OkHttpClient.Builder()
         .connectTimeout(1, TimeUnit.MINUTES)
         .writeTimeout(1, TimeUnit.MINUTES)
@@ -108,17 +110,13 @@ object HttpRequestFactory {
                 plugin.log(PluginLog.DEBUG, "With error message: ${result.utf8()}")
                 plugin.log(PluginLog.DEBUG, "retry time $retryTime")
                 plugin.log(PluginLog.WARNING, "Response from server: %s".format(result.utf8()))
-                if (result.utf8().contains("Block not found", true)) {
-                    // This is need because lightningd continue to require block until the backend respond with null value
-                    // This is one cases where the http failure is accepted
-                    return result
-                }
-                if (!isValid(response)) {
+                val checkResult = checkChains.check(plugin, result)
+                if (!isValid(response) && checkResult.result!!.utf8() == "Check fails") {
                     retryTime++
                     response = makeRequest(request)
                     continue
                 }
-                return result
+                return checkResult.result!!
             } catch (ex: Exception) {
                 if (retryTime > 4) {
                     throw ex
