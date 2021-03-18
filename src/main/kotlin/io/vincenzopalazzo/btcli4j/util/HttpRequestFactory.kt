@@ -41,10 +41,10 @@ object HttpRequestFactory {
 
     private var proxyEnabled: Boolean = false
     private var client = OkHttpClient.Builder()
-            .connectTimeout(1, TimeUnit.MINUTES)
-            .writeTimeout(1, TimeUnit.MINUTES)
-            .readTimeout(1, TimeUnit.MINUTES)
-            .build()
+        .connectTimeout(1, TimeUnit.MINUTES)
+        .writeTimeout(1, TimeUnit.MINUTES)
+        .readTimeout(1, TimeUnit.MINUTES)
+        .build()
 
     fun configureProxy(proxyString: String, tor: Boolean = true) {
         val tokens = proxyString.split(":")
@@ -54,35 +54,31 @@ object HttpRequestFactory {
         if (tor) {
             val proxyTor = Proxy(Proxy.Type.SOCKS, proxyAddr)
             client = OkHttpClient.Builder()
-                    .proxy(proxyTor)
-                    .connectTimeout(2, TimeUnit.MINUTES)
-                    .writeTimeout(2, TimeUnit.MINUTES)
-                    .readTimeout(2, TimeUnit.MINUTES)
-                    .build()
+                .proxy(proxyTor)
+                .connectTimeout(2, TimeUnit.MINUTES)
+                .writeTimeout(2, TimeUnit.MINUTES)
+                .readTimeout(2, TimeUnit.MINUTES)
+                .build()
             proxyEnabled = true
         }
     }
 
-    fun buildQueryRL(network: String): String{
-        if(network == "bitcoin"){
+    fun buildQueryRL(network: String): String {
+        if (network == "bitcoin") {
             return "api"
         }
         return "$network/api"
     }
 
-    fun createRequest(url: String, type: String = "get", body: String = "",
-                      mediaType: MediaType = "application/json; charset=utf-8".toMediaType(),
-                      torVersion: Int = 3
+    fun createRequest(
+        url: String, type: String = "get", body: String = "",
+        mediaType: MediaType = "application/json; charset=utf-8".toMediaType(),
+        torVersion: Int = 3
     ): Request? {
         val baseUrl: String
-        if (proxyEnabled) {
-            if (torVersion == 3) {
-                baseUrl = BASE_URL_TORV3
-            } else {
-                baseUrl = BASE_URL_TORV2
-            }
-        } else {
-            baseUrl = BASE_URL
+        when (proxyEnabled) {
+            true -> baseUrl = if (torVersion == 3) BASE_URL_TORV3 else BASE_URL_TORV2
+            false -> baseUrl = BASE_URL
         }
         val completeUrl = "%s/%s".format(baseUrl, url)
         when (type) {
@@ -102,29 +98,49 @@ object HttpRequestFactory {
      */
     @Throws(IOException::class)
     fun execRequest(plugin: CLightningPlugin, request: Request): ByteString {
-        var response: Response = client.newCall(request).execute()
+        val response = makeRequest(request)
         var retryTime = 0
-        var result: ByteString
-        while (!isValid(response) && retryTime < 4) {
-            result = response.body!!.byteString()
-            response.close()
-            plugin.log(PluginLog.DEBUG, "During http request to URL ${request.url}")
-            plugin.log(PluginLog.DEBUG, "With error message: ${result.utf8()}")
-            plugin.log(PluginLog.DEBUG, "retry time $retryTime")
-            if(result.utf8().contains("Block not found", true)){
-                //This is need because lightningd continue to require block until the backend respond with null value
-                //This is one cases where the http failure is accepted
+        while(!isValid(response) && retryTime <= 4) {
+            try {
+                val result = response.body!!.byteString()
+                plugin.log(PluginLog.DEBUG, "During http request to URL ${request.url}")
+                plugin.log(PluginLog.DEBUG, "With error message: ${result.utf8()}")
+                plugin.log(PluginLog.DEBUG, "retry time $retryTime")
+                plugin.log(PluginLog.WARNING, "Response from server: %s".format(result.utf8()))
+                if (result.utf8().contains("Block not found", true)) {
+                    //This is need because lightningd continue to require block until the backend respond with null value
+                    //This is one cases where the http failure is accepted
+                    return result
+                }
+                if (!isValid(response)) {
+                    retryTime++
+                    continue
+                }
                 return result
+            } catch (ex: Exception) {
+                if (retryTime > 4) {
+                    throw ex
+                }
+                plugin.log(PluginLog.ERROR, "Error during the request method %s".format(ex.localizedMessage))
+                val exponentialRetryTime = WAIT_TIME * retryTime
+                plugin.log(
+                    PluginLog.DEBUG,
+                    "Error occurs %d time: and the waiting time is set to %d".format(retryTime, exponentialRetryTime)
+                )
+                Thread.sleep(exponentialRetryTime)
+                retryTime++
+            } finally {
+                response.close()
             }
-            retryTime++
-            val exponentialRetryTime = WAIT_TIME * retryTime
-            plugin.log(PluginLog.DEBUG, "Error occurs %d time: and the waiting time is set to %d".format(retryTime, exponentialRetryTime))
-            Thread.sleep(exponentialRetryTime)
-            response = client.newCall(request).execute()
         }
-        result = response.body!!.byteString()
-        response.close()
-        return result
+        if(isValid(response)) {
+            return response.body!!.byteString()
+        }
+        throw Exception("Error generate from Bitcoin backend more than 4 time")
+    }
+
+    private fun makeRequest(request: Request): Response {
+        return client.newCall(request).execute()
     }
 
     private fun isValid(response: Response?): Boolean {

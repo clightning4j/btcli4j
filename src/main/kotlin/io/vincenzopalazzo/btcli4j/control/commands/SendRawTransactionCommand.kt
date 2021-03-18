@@ -32,21 +32,22 @@ import okio.IOException
 class SendRawTransactionCommand : ICommand {
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
         val queryUrl = HttpRequestFactory.buildQueryRL(plugin.configs.network)
-
         val txRaw = request["tx"].asString
         try {
             val reqSendTx = HttpRequestFactory.createRequest("%s/tx".format(queryUrl), type = "post", body = txRaw,
                     mediaType = "plain/text".toMediaType())!!
 
             val resSendTx = HttpRequestFactory.execRequest(plugin, reqSendTx).utf8()
-
             response.apply {
                 add("success", resSendTx.isNotEmpty()) // TODO validate if it is a txId
                 add("errmsg", resSendTx.isNotEmpty()) // check this code
             }
         } catch (ex: IOException) {
             plugin.log(PluginLog.WARNING, ex.localizedMessage)
-            throw CLightningPluginException(400, ex.localizedMessage)
+            response.apply {
+                add("success", false) // TODO validate if it is a txId
+                add("errmsg", ex.localizedMessage) // check this code
+            }
         }
     }
 
