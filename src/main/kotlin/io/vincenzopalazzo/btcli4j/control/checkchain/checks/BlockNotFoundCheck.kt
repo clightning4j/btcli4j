@@ -9,10 +9,10 @@ import okio.ByteString
  * it is not available, the request will be not available and for this
  * reason we need to make a check of the message inside this request.
  */
-class BlockNotFoundCheck: CheckHandler {
+class BlockNotFoundCheck : CheckHandler {
     override fun check(plugin: CLightningPlugin, response: ByteString): CheckResult {
         if (response.utf8().contentEquals("Block not found")) {
-           return CheckResult(false, response)
+            return CheckResult(false, response)
         }
         return CheckResult(true)
     }

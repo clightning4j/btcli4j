@@ -4,7 +4,7 @@ import io.vincenzopalazzo.btcli4j.control.checkchain.CheckResult
 import jrpc.clightning.plugins.CLightningPlugin
 import okio.ByteString
 
-class TransactionCheck: CheckHandler {
+class TransactionCheck : CheckHandler {
     override fun check(plugin: CLightningPlugin, response: ByteString): CheckResult {
         val responseString = response.utf8()
         // What this error means from esplora API?
