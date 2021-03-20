@@ -40,11 +40,12 @@ object HttpRequestFactory {
     private const val BASE_URL = "https://blockstream.info"
     private const val BASE_URL_TORV3 = "http://explorerzydxu5ecjrkwceayqybizmpjjznk5izmitf2modhcusuqlid.onion"
     private const val BASE_URL_TORV2 = "http://explorernuoc63nb.onion"
-    private const val WAIT_TIME: Long = 60000
+    private const val WAIT_TIME: Long = 60000 // TODO: Make this propriety available in the console
 
     private var proxyEnabled: Boolean = false
     private var checkChains = ChainOfResponsibilityCheck()
     private var client = OkHttpClient.Builder()
+        .retryOnConnectionFailure(true)
         .connectTimeout(1, TimeUnit.MINUTES)
         .writeTimeout(1, TimeUnit.MINUTES)
         .readTimeout(1, TimeUnit.MINUTES)
@@ -58,6 +59,7 @@ object HttpRequestFactory {
         if (tor) {
             val proxyTor = Proxy(Proxy.Type.SOCKS, proxyAddr)
             client = OkHttpClient.Builder()
+                .retryOnConnectionFailure(true)
                 .proxy(proxyTor)
                 .connectTimeout(2, TimeUnit.MINUTES)
                 .writeTimeout(2, TimeUnit.MINUTES)
@@ -112,7 +114,8 @@ object HttpRequestFactory {
                 plugin.log(PluginLog.WARNING, "Response from server: %s".format(result.utf8()))
                 val checkResult = checkChains.check(plugin, result)
                 if (!isValid(response) && checkResult.result!!.utf8() == "Check fails") {
-                    retryTime++
+                    plugin.log(PluginLog.WARNING, "Response invalid, all the check on request filed")
+                    retryTime = waitingToRetry(plugin, retryTime)
                     response = makeRequest(request)
                     continue
                 }
@@ -122,22 +125,25 @@ object HttpRequestFactory {
                     throw ex
                 }
                 plugin.log(PluginLog.ERROR, "Error during the request method %s".format(ex.localizedMessage))
-                val exponentialRetryTime = WAIT_TIME * retryTime
-                plugin.log(
-                    PluginLog.DEBUG,
-                    "Error occurs %d time: and the waiting time is set to %d".format(retryTime, exponentialRetryTime)
-                )
-                Thread.sleep(exponentialRetryTime)
-                retryTime++
+                retryTime = waitingToRetry(plugin, retryTime)
                 response = makeRequest(request)
-            } finally {
-                response.close()
             }
         }
         if (isValid(response)) {
             return response.body!!.byteString()
         }
         throw Exception("Error generate from Bitcoin backend more than 4 time")
+    }
+
+    private fun waitingToRetry(plugin: CLightningPlugin, retryTime: Int): Int {
+        // response.close()
+        val exponentialRetryTime = WAIT_TIME * (retryTime + 1)
+        plugin.log(
+            PluginLog.WARNING,
+            "Error occurs %d time: and the waiting time is set to %d".format(retryTime, exponentialRetryTime)
+        )
+        Thread.sleep(exponentialRetryTime)
+        return retryTime + 1
     }
 
     private fun makeRequest(request: Request): Response {
