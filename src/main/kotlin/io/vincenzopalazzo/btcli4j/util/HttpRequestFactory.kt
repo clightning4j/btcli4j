@@ -40,7 +40,7 @@ object HttpRequestFactory {
     private const val BASE_URL = "https://blockstream.info"
     private const val BASE_URL_TORV3 = "http://explorerzydxu5ecjrkwceayqybizmpjjznk5izmitf2modhcusuqlid.onion"
     private const val BASE_URL_TORV2 = "http://explorernuoc63nb.onion"
-    private const val WAIT_TIME: Long = 60000 //TODO: Make this propriety available in the console
+    private const val WAIT_TIME: Long = 60000 // TODO: Make this propriety available in the console
 
     private var proxyEnabled: Boolean = false
     private var checkChains = ChainOfResponsibilityCheck()
