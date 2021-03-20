@@ -115,7 +115,7 @@ object HttpRequestFactory {
                 val checkResult = checkChains.check(plugin, result)
                 if (!isValid(response) && checkResult.result!!.utf8() == "Check fails") {
                     plugin.log(PluginLog.WARNING, "Response invalid, all the check on request filed")
-                    retryTime = waitingToRetry(plugin, retryTime, response)
+                    retryTime = waitingToRetry(plugin, retryTime)
                     response = makeRequest(request)
                     continue
                 }
@@ -125,20 +125,18 @@ object HttpRequestFactory {
                     throw ex
                 }
                 plugin.log(PluginLog.ERROR, "Error during the request method %s".format(ex.localizedMessage))
-                retryTime = waitingToRetry(plugin, retryTime, response)
+                retryTime = waitingToRetry(plugin, retryTime)
                 response = makeRequest(request)
             }
         }
         if (isValid(response)) {
-            val result = response.body!!.byteString()
-            response.close()
-            return result
+            return response.body!!.byteString()
         }
         throw Exception("Error generate from Bitcoin backend more than 4 time")
     }
 
-    private fun waitingToRetry(plugin: CLightningPlugin, retryTime: Int, response: Response): Int {
-        response.close()
+    private fun waitingToRetry(plugin: CLightningPlugin, retryTime: Int): Int {
+        // response.close()
         val exponentialRetryTime = WAIT_TIME * (retryTime + 1)
         plugin.log(
             PluginLog.WARNING,
