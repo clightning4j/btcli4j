@@ -45,6 +45,7 @@ object HttpRequestFactory {
     private var proxyEnabled: Boolean = false
     private var checkChains = ChainOfResponsibilityCheck()
     private var client = OkHttpClient.Builder()
+        .retryOnConnectionFailure(true)
         .connectTimeout(1, TimeUnit.MINUTES)
         .writeTimeout(1, TimeUnit.MINUTES)
         .readTimeout(1, TimeUnit.MINUTES)
@@ -58,6 +59,7 @@ object HttpRequestFactory {
         if (tor) {
             val proxyTor = Proxy(Proxy.Type.SOCKS, proxyAddr)
             client = OkHttpClient.Builder()
+                .retryOnConnectionFailure(true)
                 .proxy(proxyTor)
                 .connectTimeout(2, TimeUnit.MINUTES)
                 .writeTimeout(2, TimeUnit.MINUTES)
