@@ -24,7 +24,6 @@ import jrpc.clightning.plugins.exceptions.CLightningPluginException
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 import okhttp3.MediaType.Companion.toMediaType
-import okio.IOException
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -39,31 +38,41 @@ class GetRawBlockByHeightCommand : ICommand {
                 "%s/block-height/%s".format(queryUrl, heightRequest),
                 mediaType = "text/plain".toMediaType()
             )!!
+            // get block reference by height
             val resBlockHash = HttpRequestFactory.execRequest(plugin, blockWithHeight).utf8()
             plugin.log(PluginLog.DEBUG, "$blockWithHeight Hash $resBlockHash")
             val hexBlock: String
             if (resBlockHash.isNotEmpty() && resBlockHash != "Block not found") {
+                // get the raw block by block hash
                 val blockWithHash = HttpRequestFactory.createRequest(
                     "%s/block/%s/raw".format(queryUrl, resBlockHash),
                     mediaType = "text/plain".toMediaType()
                 )!!
                 blockWithHash.header("Content-Encoding: gzip")
                 hexBlock = HttpRequestFactory.execRequest(plugin, blockWithHash).hex()
-                response.apply {
-                    add("blockhash", resBlockHash)
-                    add("block", hexBlock)
+                if (hexBlock.length < 150) {
+                    //150 is a random number there is any real motivation.
+                    // sanity check, esplora return a wrong value as block hex;
+                    // the problem is also described here
+                    returnResponse(response)
+                } else {
+                    returnResponse(response, resBlockHash, hexBlock)
                 }
             } else {
                 // Lightningd continue to require bitcoin block and it know that the block is the last
                 // only if it receive the object with null proprieties
-                response.apply {
-                    add("blockhash", null)
-                    add("block", null)
-                }
+                returnResponse(response)
             }
-        } catch (ex: IOException) {
+        } catch (ex: Exception) {
             plugin.log(PluginLog.WARNING, ex.message)
             throw CLightningPluginException(ex.cause)
+        }
+    }
+
+    private fun returnResponse(response: CLightningJsonObject, blockHash: String? = null, blockHex: String? = null) {
+        response.apply {
+            add("blockhash", blockHash)
+            add("block", blockHex)
         }
     }
 }

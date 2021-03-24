@@ -113,7 +113,7 @@ object HttpRequestFactory {
                 plugin.log(PluginLog.DEBUG, "retry time $retryTime")
                 plugin.log(PluginLog.WARNING, "Response from server: %s".format(result.utf8()))
                 val checkResult = checkChains.check(plugin, result)
-                if (!isValid(response) && checkResult.result!!.utf8() == "Check fails") {
+                if (result.size == 0 || (!isValid(response) && checkResult.result!!.utf8() == "Check fails")) {
                     plugin.log(PluginLog.WARNING, "Response invalid, all the check on request filed")
                     retryTime = waitingToRetry(plugin, retryTime)
                     response = makeRequest(request)
