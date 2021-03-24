@@ -51,7 +51,7 @@ class GetRawBlockByHeightCommand : ICommand {
                 blockWithHash.header("Content-Encoding: gzip")
                 hexBlock = HttpRequestFactory.execRequest(plugin, blockWithHash).hex()
                 if (hexBlock.length < 150) {
-                    //150 is a random number there is any real motivation.
+                    // 150 is a random number there is any real motivation.
                     // sanity check, esplora return a wrong value as block hex;
                     // the problem is also described here
                     returnResponse(response)
