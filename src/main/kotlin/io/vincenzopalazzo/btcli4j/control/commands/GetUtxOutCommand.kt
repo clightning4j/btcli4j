@@ -26,7 +26,6 @@ import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.exceptions.CLightningPluginException
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
-import okio.IOException
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -56,7 +55,7 @@ class GetUtxOutCommand : ICommand {
                     }
                 }
             }
-        } catch (ex: IOException) {
+        } catch (ex: Exception) {
             plugin.log(PluginLog.WARNING, ex.localizedMessage)
             throw CLightningPluginException(400, ex.localizedMessage)
         }

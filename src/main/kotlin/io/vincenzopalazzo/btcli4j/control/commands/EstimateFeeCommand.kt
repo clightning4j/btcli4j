@@ -21,7 +21,6 @@ package io.vincenzopalazzo.btcli4j.control.commands
 import io.vincenzopalazzo.btcli4j.model.EstimateFeeModel
 import io.vincenzopalazzo.btcli4j.util.HttpRequestFactory
 import io.vincenzopalazzo.btcli4j.util.JSONConverter
-import java.io.IOException
 import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.exceptions.CLightningPluginException
 import jrpc.clightning.plugins.log.PluginLog
@@ -72,7 +71,7 @@ class EstimateFeeCommand : ICommand {
                     add("max_acceptable", null)
                 }
             }
-        } catch (ex: IOException) {
+        } catch (ex: Exception) {
             plugin.log(PluginLog.ERROR, ex.localizedMessage)
             throw CLightningPluginException(400, ex.localizedMessage)
         }

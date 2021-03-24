@@ -105,8 +105,13 @@ object HttpRequestFactory {
     fun execRequest(plugin: CLightningPlugin, request: Request): ByteString {
         var response = makeRequest(request)
         var retryTime = 0
+        var withException = false
         while (!isValid(response) && retryTime <= 4) {
             try {
+                if (withException) {
+                    withException = false
+                    response = makeRequest(request)
+                }
                 val result = response.body!!.byteString()
                 plugin.log(PluginLog.DEBUG, "During http request to URL ${request.url}")
                 plugin.log(PluginLog.DEBUG, "With error message: ${result.utf8()}")
@@ -122,11 +127,16 @@ object HttpRequestFactory {
                 return checkResult.result!!
             } catch (ex: Exception) {
                 if (retryTime > 4) {
+                    // We are in develop phases we need can do this to receive more information
+                    ex.printStackTrace()
                     throw ex
                 }
                 plugin.log(PluginLog.ERROR, "Error during the request method %s".format(ex.localizedMessage))
                 retryTime = waitingToRetry(plugin, retryTime)
-                response = makeRequest(request)
+                // To avoid made another exception because esplora could be lock the request for X second
+                // from one custom ip we retry the request with a flag
+                // response = makeRequest(request)
+                withException = true
             }
         }
         if (isValid(response)) {
