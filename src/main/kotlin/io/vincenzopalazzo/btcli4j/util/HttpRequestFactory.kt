@@ -43,6 +43,7 @@ object HttpRequestFactory {
     private const val WAIT_TIME: Long = 60000 // TODO: Make this propriety available in the console
 
     private var proxyEnabled: Boolean = false
+    private var retryTime = 4
     private var checkChains = ChainOfResponsibilityCheck()
     private var client = OkHttpClient.Builder()
         .retryOnConnectionFailure(true)
@@ -103,57 +104,45 @@ object HttpRequestFactory {
      */
     @Throws(Exception::class)
     fun execRequest(plugin: CLightningPlugin, request: Request): ByteString {
-        var response = makeRequest(request)
-        var retryTime = 0
-        var withException = false
-        while (!isValid(response) && retryTime <= 4) {
+        for (time in 0..retryTime) {
             try {
-                if (withException) {
-                    withException = false
-                    response = makeRequest(request)
+                val response = makeRequest(request)
+                if (isValid(response)) {
+                    val result = response.body!!.byteString()
+                    plugin.log(PluginLog.DEBUG, "During http request to URL ${request.url}")
+                    plugin.log(PluginLog.DEBUG, "I have the following result ${result.utf8()}")
+                    val checkResult = checkChains.check(plugin, result)
+                    // This is a error with the a 200 code
+                    // this can happen often with the client-server communication
+                    if (result.size == 0 || checkResult.result!!.utf8() == "Check fails") {
+                        plugin.log(PluginLog.DEBUG, "An wrong status happen in retry time $retryTime")
+                        plugin.log(PluginLog.WARNING, "Response invalid, all the plugin check on the request failed")
+                        waitingToRetry(plugin, retryTime)
+                        continue
+                    }
+                    return checkResult.result
                 }
-                val result = response.body!!.byteString()
-                plugin.log(PluginLog.DEBUG, "During http request to URL ${request.url}")
-                plugin.log(PluginLog.DEBUG, "With error message: ${result.utf8()}")
-                plugin.log(PluginLog.DEBUG, "retry time $retryTime")
-                plugin.log(PluginLog.WARNING, "Response from server: %s".format(result.utf8()))
-                val checkResult = checkChains.check(plugin, result)
-                if (result.size == 0 || (!isValid(response) && checkResult.result!!.utf8() == "Check fails")) {
-                    plugin.log(PluginLog.WARNING, "Response invalid, all the check on request filed")
-                    retryTime = waitingToRetry(plugin, retryTime)
-                    response = makeRequest(request)
-                    continue
-                }
-                return checkResult.result!!
+                // an error occurs with an invalid error
+                plugin.log(PluginLog.DEBUG, "An wrong status happen in retry time $retryTime")
+                waitingToRetry(plugin, retryTime)
             } catch (ex: Exception) {
-                if (retryTime > 4) {
-                    // We are in develop phases we need can do this to receive more information
-                    ex.printStackTrace()
-                    throw ex
-                }
+                plugin.log(PluginLog.DEBUG, "An wrong status happen in retry time $retryTime")
                 plugin.log(PluginLog.ERROR, "Error during the request method %s".format(ex.localizedMessage))
-                retryTime = waitingToRetry(plugin, retryTime)
-                // To avoid made another exception because esplora could be lock the request for X second
-                // from one custom ip we retry the request with a flag
-                // response = makeRequest(request)
-                withException = true
+                waitingToRetry(plugin, retryTime)
             }
         }
-        if (isValid(response)) {
-            return response.body!!.byteString()
-        }
+        // never found a valid answer and I'm exit with an error.
+        plugin.log(PluginLog.ERROR, "After all retry time ($retryTime) all request failed")
         throw Exception("Error generate from Bitcoin backend more than 4 time")
     }
 
-    private fun waitingToRetry(plugin: CLightningPlugin, retryTime: Int): Int {
-        // response.close()
+    private fun waitingToRetry(plugin: CLightningPlugin, retryTime: Int) {
         val exponentialRetryTime = WAIT_TIME * (retryTime + 1)
         plugin.log(
             PluginLog.WARNING,
             "Error occurs %d time: and the waiting time is set to %d".format(retryTime, exponentialRetryTime)
         )
         Thread.sleep(exponentialRetryTime)
-        return retryTime + 1
     }
 
     private fun makeRequest(request: Request): Response {

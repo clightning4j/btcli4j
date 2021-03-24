@@ -20,7 +20,6 @@ package io.vincenzopalazzo.btcli4j.control.commands
 
 import io.vincenzopalazzo.btcli4j.util.HttpRequestFactory
 import jrpc.clightning.plugins.CLightningPlugin
-import jrpc.clightning.plugins.exceptions.CLightningPluginException
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 import okhttp3.MediaType.Companion.toMediaType
@@ -65,7 +64,8 @@ class GetRawBlockByHeightCommand : ICommand {
             }
         } catch (ex: Exception) {
             plugin.log(PluginLog.WARNING, ex.message)
-            throw CLightningPluginException(ex.cause)
+            // throw CLightningPluginException(ex.cause)
+            returnResponse(response)
         }
     }
 
