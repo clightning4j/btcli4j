@@ -111,22 +111,22 @@ object HttpRequestFactory {
                     val result = response.body!!.byteString()
                     plugin.log(PluginLog.DEBUG, "During http request to URL ${request.url}")
                     plugin.log(PluginLog.DEBUG, "I have the following result ${result.utf8()}")
-                    val checkResult = checkChains.check(plugin, result)
-                    // This is a error with the a 200 code
-                    // this can happen often with the client-server communication
-                    if (result.size == 0 || checkResult.result!!.utf8() == "Check fails") {
-                        plugin.log(PluginLog.DEBUG, "An wrong status happen in retry time $retryTime")
-                        plugin.log(PluginLog.WARNING, "Response invalid, all the plugin check on the request failed")
-                        waitingToRetry(plugin, retryTime)
-                        continue
-                    }
-                    return checkResult.result
+                    return result
                 }
-                // an error occurs with an invalid error
-                plugin.log(PluginLog.DEBUG, "An wrong status happen in retry time $retryTime")
-                waitingToRetry(plugin, retryTime)
+                // there are some cases where the invalid answer can be accepted from lightnind
+                val result = response.body!!.byteString()
+                val checkResult = checkChains.check(plugin, result)
+                // This is a error with the a 200 code
+                // this can happen often with the client-server communication
+                if (checkResult.result!!.utf8() == "Check fails") {
+                    plugin.log(PluginLog.DEBUG, "An wrong status happen in retry time $time")
+                    plugin.log(PluginLog.WARNING, "Response invalid, all the plugin check on the request failed")
+                    waitingToRetry(plugin, retryTime)
+                    continue
+                }
+                return result
             } catch (ex: Exception) {
-                plugin.log(PluginLog.DEBUG, "An wrong status happen in retry time $retryTime")
+                plugin.log(PluginLog.DEBUG, "An wrong status happen in retry time $time")
                 plugin.log(PluginLog.ERROR, "Error during the request method %s".format(ex.localizedMessage))
                 waitingToRetry(plugin, retryTime)
             }
