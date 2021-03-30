@@ -4,9 +4,15 @@ plugins {
     application
 }
 
+configurations.all {
+    resolutionStrategy.cacheDynamicVersionsFor(0, "seconds")
+    resolutionStrategy.cacheChangingModulesFor(0, "seconds")
+}
+
 repositories {
     jcenter()
     mavenCentral()
+    maven("https://oss.sonatype.org/content/repositories/snapshots")
 }
 
 dependencies {
@@ -17,12 +23,12 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
-    //implementation("io.github.clightning4j:jrpclightning:0.1.8")
+    implementation("io.github.clightning4j:jrpclightning:0.1.9-SNAPSHOT")
 
     //Developing library
-    api(fileTree("${project.projectDir}/devlibs") {
+    /*api(fileTree("${project.projectDir}/devlibs") {
         include("jrpclightning-0.1.9-SNAPSHOT-with-dependencies.jar")
-    })
+    }) */
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 }
