@@ -16,37 +16,23 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package io.vincenzopalazzo.btcli4j.util
+package io.vincenzopalazzo.btcli4j.model.esplora
 
-import com.google.gson.GsonBuilder
-import io.vincenzopalazzo.btcli4j.model.esplora.EstimateFeeModel
-import io.vincenzopalazzo.btcli4j.util.typeadapter.EstimateFeeTypeAdapter
-import java.lang.reflect.Type
+import com.google.gson.annotations.SerializedName
 
 /**
  * @author https://github.com/vincenzopalazzo
  */
-object JSONConverter {
+class BTCTransactionOutputModel {
 
-    private val gsonBuilder = GsonBuilder()
+    @SerializedName("scriptpubkey")
+    val scriptPubKey: String? = null
 
-    init {
-        gsonBuilder.registerTypeAdapter(EstimateFeeModel::class.java, EstimateFeeTypeAdapter())
-        gsonBuilder.setPrettyPrinting()
-    }
+    @SerializedName("scriptpubkey_asm")
+    val scriptPubKeyAsm: String? = null
 
-    private val gson = gsonBuilder.create()
+    @SerializedName("scriptpubkey_type")
+    val scriptPubKeyType: String? = null
 
-    fun serialize(obj: Any): String? {
-        return gson.toJson(obj)
-    }
-
-    fun <T> deserialize(fromString: String, responseType: Type): T {
-        try {
-            return gson.fromJson(fromString, responseType)
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-            throw RuntimeException(ex.cause)
-        }
-    }
+    val value: Long = 0
 }

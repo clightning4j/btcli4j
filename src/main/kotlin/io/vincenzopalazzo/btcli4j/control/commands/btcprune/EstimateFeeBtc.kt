@@ -16,18 +16,18 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package io.vincenzopalazzo.btcli4j.model
+package io.vincenzopalazzo.btcli4j.control.commands.btcprune
+
+import io.github.clightning4j.litebtc.LiteBitcoinRPC
+import io.vincenzopalazzo.btcli4j.control.commands.ICommand
+import jrpc.clightning.plugins.CLightningPlugin
+import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 
 /**
  * @author https://github.com/vincenzopalazzo
  */
-class StatusUTXOModel {
-
-    var spend: Boolean = false
-
-    var txid: String? = null
-
-    var vin: Int? = null
-
-    var status: StatusOnChain? = null
+class EstimateFeeBtc(private val bitcoinRPC: LiteBitcoinRPC) : ICommand {
+    override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
+        TODO("Not yet implemented")
+    }
 }

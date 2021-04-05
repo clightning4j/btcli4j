@@ -16,23 +16,18 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package io.vincenzopalazzo.btcli4j.model
+package io.vincenzopalazzo.btcli4j.control.commands.btcprune
 
-import com.google.gson.annotations.SerializedName
+import io.github.clightning4j.litebtc.LiteBitcoinRPC
+import io.vincenzopalazzo.btcli4j.control.commands.ICommand
+import jrpc.clightning.plugins.CLightningPlugin
+import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 
 /**
  * @author https://github.com/vincenzopalazzo
  */
-class BTCTransactionOutputModel {
-
-    @SerializedName("scriptpubkey")
-    val scriptPubKey: String? = null
-
-    @SerializedName("scriptpubkey_asm")
-    val scriptpubkeyAsm: String? = null
-
-    @SerializedName("scriptpubkey_type")
-    val scriptPubKeyType: String? = null
-
-    val value: Long = 0
+class GetUtxOutBtc(private val bitcoinRPC: LiteBitcoinRPC) : ICommand {
+    override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
+        TODO("Not yet implemented")
+    }
 }

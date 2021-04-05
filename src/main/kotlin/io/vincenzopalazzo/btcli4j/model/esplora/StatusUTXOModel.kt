@@ -16,37 +16,18 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package io.vincenzopalazzo.btcli4j.util
-
-import com.google.gson.GsonBuilder
-import io.vincenzopalazzo.btcli4j.model.esplora.EstimateFeeModel
-import io.vincenzopalazzo.btcli4j.util.typeadapter.EstimateFeeTypeAdapter
-import java.lang.reflect.Type
+package io.vincenzopalazzo.btcli4j.model.esplora
 
 /**
  * @author https://github.com/vincenzopalazzo
  */
-object JSONConverter {
+class StatusUTXOModel {
 
-    private val gsonBuilder = GsonBuilder()
+    var spend: Boolean = false
 
-    init {
-        gsonBuilder.registerTypeAdapter(EstimateFeeModel::class.java, EstimateFeeTypeAdapter())
-        gsonBuilder.setPrettyPrinting()
-    }
+    var txid: String? = null
 
-    private val gson = gsonBuilder.create()
+    var vin: Int? = null
 
-    fun serialize(obj: Any): String? {
-        return gson.toJson(obj)
-    }
-
-    fun <T> deserialize(fromString: String, responseType: Type): T {
-        try {
-            return gson.fromJson(fromString, responseType)
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-            throw RuntimeException(ex.cause)
-        }
-    }
+    var status: StatusOnChain? = null
 }

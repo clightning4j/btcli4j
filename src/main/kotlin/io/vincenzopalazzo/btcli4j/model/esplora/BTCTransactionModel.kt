@@ -16,37 +16,34 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package io.vincenzopalazzo.btcli4j.util
+package io.vincenzopalazzo.btcli4j.model.esplora
 
-import com.google.gson.GsonBuilder
-import io.vincenzopalazzo.btcli4j.model.esplora.EstimateFeeModel
-import io.vincenzopalazzo.btcli4j.util.typeadapter.EstimateFeeTypeAdapter
-import java.lang.reflect.Type
+import com.google.gson.annotations.SerializedName
 
 /**
  * @author https://github.com/vincenzopalazzo
  */
-object JSONConverter {
+class BTCTransactionModel {
 
-    private val gsonBuilder = GsonBuilder()
+    @SerializedName("txid")
+    val txId: String? = null
 
-    init {
-        gsonBuilder.registerTypeAdapter(EstimateFeeModel::class.java, EstimateFeeTypeAdapter())
-        gsonBuilder.setPrettyPrinting()
-    }
+    val version: Int = 0
 
-    private val gson = gsonBuilder.create()
+    @SerializedName("locktime")
+    val lockTime: Long = 0
 
-    fun serialize(obj: Any): String? {
-        return gson.toJson(obj)
-    }
+    @SerializedName("vin")
+    val transactionsInputs: List<BTCTransactionInputModel>? = null
 
-    fun <T> deserialize(fromString: String, responseType: Type): T {
-        try {
-            return gson.fromJson(fromString, responseType)
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-            throw RuntimeException(ex.cause)
-        }
-    }
+    @SerializedName("vout")
+    val transactionsOutput: List<BTCTransactionOutputModel>? = null
+
+    val size: Long = 0
+
+    val weight: Long = 0
+
+    val fee: Long = 0
+
+    val status: TransactionStatusModel? = null
 }

@@ -20,6 +20,7 @@ package io.vincenzopalazzo.btcli4j
 
 import io.vincenzopalazzo.btcli4j.control.MediationMethod
 import io.vincenzopalazzo.btcli4j.util.HttpRequestFactory
+import io.vincenzopalazzo.btcli4j.util.PluginManager
 import jrpc.clightning.annotation.PluginOption
 import jrpc.clightning.annotation.RPCMethod
 import jrpc.clightning.plugins.CLightningPlugin
@@ -54,6 +55,38 @@ class Plugin : CLightningPlugin() {
         typeValue = "string"
     )
     private var personalEndPoint: String = ""
+
+    @PluginOption(
+        name = "bitcoin-rpcpassword",
+        description = "Bitcoin RPC password",
+        defValue = "",
+        typeValue = "string"
+    )
+    private var bitcoinRpcPass: String = ""
+
+    @PluginOption(
+        name = "bitcoin-rpcuser",
+        description = "Bitcoin RPC user",
+        defValue = "",
+        typeValue = "string"
+    )
+    private var bitcoinRpcUser: String = ""
+
+    @PluginOption(
+        name = "bitcoin-rpcurl",
+        description = "Base URL Bitcoin RPC",
+        defValue = "",
+        typeValue = "string"
+    )
+    private var bitcoinBaseUrl: String = ""
+
+    @PluginOption(
+        name = "btcli4j-pruned",
+        description = "Tell to BTC4J plugin to use the pruned mode",
+        defValue = "false",
+        typeValue = "flag"
+    )
+    private var prunedMode = false
 
     private var pluginInit = false
 
@@ -96,6 +129,13 @@ class Plugin : CLightningPlugin() {
                 HttpRequestFactory.configureProxy(this.proxy, true)
                 log(PluginLog.INFO, "Tor proxy enabled on btcli4j")
             }
+        }
+
+        if (prunedMode && bitcoinRpcPass.trim().isEmpty() && bitcoinRpcUser.trim().isEmpty()) {
+            PluginManager.instance.bitcoinPass = bitcoinRpcPass
+            PluginManager.instance.bitcoinUser = bitcoinRpcUser
+            PluginManager.instance.baseBitcoinUrl = bitcoinBaseUrl
+            PluginManager.instance.prunedMode = true
         }
     }
 }

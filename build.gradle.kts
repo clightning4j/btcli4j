@@ -23,6 +23,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
+    implementation("io.github.clightning4j:lite-bitcoin-rpc:0.0.1-rc1-SNAPSHOT")
     implementation("io.github.clightning4j:jrpclightning:0.2.0-SNAPSHOT")
 
     //Developing library

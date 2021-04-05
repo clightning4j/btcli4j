@@ -16,37 +16,18 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package io.vincenzopalazzo.btcli4j.util
+package io.vincenzopalazzo.btcli4j.control.commands.btcprune
 
-import com.google.gson.GsonBuilder
-import io.vincenzopalazzo.btcli4j.model.esplora.EstimateFeeModel
-import io.vincenzopalazzo.btcli4j.util.typeadapter.EstimateFeeTypeAdapter
-import java.lang.reflect.Type
+import io.github.clightning4j.litebtc.LiteBitcoinRPC
+import io.vincenzopalazzo.btcli4j.control.commands.ICommand
+import jrpc.clightning.plugins.CLightningPlugin
+import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 
 /**
  * @author https://github.com/vincenzopalazzo
  */
-object JSONConverter {
-
-    private val gsonBuilder = GsonBuilder()
-
-    init {
-        gsonBuilder.registerTypeAdapter(EstimateFeeModel::class.java, EstimateFeeTypeAdapter())
-        gsonBuilder.setPrettyPrinting()
-    }
-
-    private val gson = gsonBuilder.create()
-
-    fun serialize(obj: Any): String? {
-        return gson.toJson(obj)
-    }
-
-    fun <T> deserialize(fromString: String, responseType: Type): T {
-        try {
-            return gson.fromJson(fromString, responseType)
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-            throw RuntimeException(ex.cause)
-        }
+class SendRawTransactionBtc(private val bitcoinRPC: LiteBitcoinRPC) : ICommand {
+    override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
+        TODO("Not yet implemented")
     }
 }

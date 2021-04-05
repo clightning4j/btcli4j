@@ -4,7 +4,7 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
-import io.vincenzopalazzo.btcli4j.model.EstimateFeeModel
+import io.vincenzopalazzo.btcli4j.model.esplora.EstimateFeeModel
 import java.math.BigDecimal
 
 class EstimateFeeTypeAdapter : TypeAdapter<EstimateFeeModel>() {

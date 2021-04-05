@@ -16,10 +16,11 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package io.vincenzopalazzo.btcli4j.control.commands
+package io.vincenzopalazzo.btcli4j.control.commands.esplora
 
-import io.vincenzopalazzo.btcli4j.model.BTCTransactionModel
-import io.vincenzopalazzo.btcli4j.model.StatusUTXOModel
+import io.vincenzopalazzo.btcli4j.control.commands.ICommand
+import io.vincenzopalazzo.btcli4j.model.esplora.BTCTransactionModel
+import io.vincenzopalazzo.btcli4j.model.esplora.StatusUTXOModel
 import io.vincenzopalazzo.btcli4j.util.HttpRequestFactory
 import io.vincenzopalazzo.btcli4j.util.JSONConverter
 import jrpc.clightning.plugins.CLightningPlugin

@@ -18,14 +18,21 @@
  */
 package io.vincenzopalazzo.btcli4j.control
 
-import io.vincenzopalazzo.btcli4j.control.commands.EstimateFeeCommand
-import io.vincenzopalazzo.btcli4j.control.commands.GetChainInfoCommand
-import io.vincenzopalazzo.btcli4j.control.commands.GetRawBlockByHeightCommand
-import io.vincenzopalazzo.btcli4j.control.commands.GetUtxOutCommand
+import io.vincenzopalazzo.btcli4j.control.commands.esplora.EstimateFeeCommand
+import io.vincenzopalazzo.btcli4j.control.commands.esplora.GetChainInfoCommand
+import io.vincenzopalazzo.btcli4j.control.commands.esplora.GetRawBlockByHeightCommand
+import io.vincenzopalazzo.btcli4j.control.commands.esplora.GetUtxOutCommand
 import io.vincenzopalazzo.btcli4j.control.commands.ICommand
-import io.vincenzopalazzo.btcli4j.control.commands.SendRawTransactionCommand
+import io.vincenzopalazzo.btcli4j.control.commands.esplora.SendRawTransactionCommand
 import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
+import io.github.clightning4j.litebtc.LiteBitcoinRPC
+import io.vincenzopalazzo.btcli4j.control.commands.btcprune.EstimateFeeBtc
+import io.vincenzopalazzo.btcli4j.control.commands.btcprune.GetChainInfoBtc
+import io.vincenzopalazzo.btcli4j.control.commands.btcprune.GetRawBlockByHeightBtc
+import io.vincenzopalazzo.btcli4j.control.commands.btcprune.GetUtxOutBtc
+import io.vincenzopalazzo.btcli4j.control.commands.btcprune.SendRawTransactionBtc
+import io.vincenzopalazzo.btcli4j.util.PluginManager
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -35,12 +42,33 @@ object MediationMethod {
     private val commands: HashMap<String, ICommand> = HashMap()
 
     init {
-        commands.apply {
-            put("getchaininfo", GetChainInfoCommand())
-            put("estimatefees", EstimateFeeCommand())
-            put("getrawblockbyheight", GetRawBlockByHeightCommand())
-            put("getutxout", GetUtxOutCommand())
-            put("sendrawtransaction", SendRawTransactionCommand())
+        // The prune mode need to be overrided with a enum
+        // because it is possible use the bitcoin RPC interface
+        // to talk with the bitcoin node and also with all the othe rimplementation
+        // that use the Bitcoin RPC 1.0 interface (e.g Litecoin)
+        if (PluginManager.instance.prunedMode) {
+            // adding prune command
+            val bitcoinRPC = LiteBitcoinRPC(
+                PluginManager.instance.bitcoinUser,
+                PluginManager.instance.bitcoinPass,
+                PluginManager.instance.baseBitcoinUrl
+            )
+
+            commands.apply {
+                put("getchaininfo", GetChainInfoBtc(bitcoinRPC))
+                put("estimatefees", EstimateFeeBtc(bitcoinRPC))
+                put("getrawblockbyheight", GetRawBlockByHeightBtc(bitcoinRPC))
+                put("getutxout", GetUtxOutBtc(bitcoinRPC))
+                put("sendrawtransaction", SendRawTransactionBtc(bitcoinRPC))
+            }
+        } else {
+            commands.apply {
+                put("getchaininfo", GetChainInfoCommand())
+                put("estimatefees", EstimateFeeCommand())
+                put("getrawblockbyheight", GetRawBlockByHeightCommand())
+                put("getutxout", GetUtxOutCommand())
+                put("sendrawtransaction", SendRawTransactionCommand())
+            }
         }
     }
 

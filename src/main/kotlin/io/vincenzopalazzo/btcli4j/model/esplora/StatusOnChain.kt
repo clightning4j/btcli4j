@@ -1,4 +1,4 @@
-package io.vincenzopalazzo.btcli4j.model
+package io.vincenzopalazzo.btcli4j.model.esplora
 
 import com.google.gson.annotations.SerializedName
 

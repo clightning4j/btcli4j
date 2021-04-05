@@ -16,34 +16,27 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package io.vincenzopalazzo.btcli4j.model
+package io.vincenzopalazzo.btcli4j.model.esplora
 
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 
 /**
  * @author https://github.com/vincenzopalazzo
  */
-class BTCTransactionModel {
+class BTCTransactionInputModel {
 
     @SerializedName("txid")
     val txId: String? = null
 
-    val version: Int = 0
+    val vout: Long = 0
 
-    @SerializedName("locktime")
-    val lockTime: Long = 0
+    @SerializedName("prevout")
+    val preVout: JsonObject? = null // What is the return type here?
 
-    @SerializedName("vin")
-    val transactionsInputs: List<BTCTransactionInputModel>? = null
+    @SerializedName("scriptsig")
+    val scriptSig: String? = null
 
-    @SerializedName("vout")
-    val transactionsOutput: List<BTCTransactionOutputModel>? = null
-
-    val size: Long = 0
-
-    val weight: Long = 0
-
-    val fee: Long = 0
-
-    val status: TransactionStatusModel? = null
+    @SerializedName("scriptsig_asm")
+    val scriptsigAsm: String? = null
 }

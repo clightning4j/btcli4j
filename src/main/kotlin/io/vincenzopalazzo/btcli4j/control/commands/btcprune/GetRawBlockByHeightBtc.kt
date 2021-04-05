@@ -16,27 +16,18 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package io.vincenzopalazzo.btcli4j.model
+package io.vincenzopalazzo.btcli4j.control.commands.btcprune
 
-import com.google.gson.JsonObject
-import com.google.gson.annotations.SerializedName
+import io.github.clightning4j.litebtc.LiteBitcoinRPC
+import io.vincenzopalazzo.btcli4j.control.commands.ICommand
+import jrpc.clightning.plugins.CLightningPlugin
+import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 
 /**
  * @author https://github.com/vincenzopalazzo
  */
-class BTCTransactionInputModel {
-
-    @SerializedName("txid")
-    val txId: String? = null
-
-    val vout: Long = 0
-
-    @SerializedName("prevout")
-    val preVout: JsonObject? = null // What is the return type here?
-
-    @SerializedName("scriptsig")
-    val scriptSig: String? = null
-
-    @SerializedName("scriptsig_asm")
-    val scriptsigAsm: String? = null
+class GetRawBlockByHeightBtc(private val bitcoinRPC: LiteBitcoinRPC) : ICommand {
+    override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
+        TODO("Not yet implemented")
+    }
 }
