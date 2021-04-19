@@ -19,15 +19,44 @@
 package io.vincenzopalazzo.btcli4j.control.commands.btcprune
 
 import io.github.clightning4j.litebtc.LiteBitcoinRPC
+import io.github.clightning4j.litebtc.exceptions.LiteBitcoinRPCException
 import io.vincenzopalazzo.btcli4j.control.commands.ICommand
+import io.vincenzopalazzo.btcli4j.control.commands.esplora.GetChainInfoCommand
+import io.vincenzopalazzo.btcli4j.model.bitcoin.BlockchainInfoBitcoin
 import jrpc.clightning.plugins.CLightningPlugin
+import jrpc.clightning.plugins.exceptions.CLightningPluginException
+import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 
 /**
  * @author https://github.com/vincenzopalazzo
  */
-class GetChainInfoBtc(private val bitcoinRPC: LiteBitcoinRPC) : ICommand {
+class GetChainInfoBtc(
+    private val bitcoinRPC: LiteBitcoinRPC,
+    private val alternative: GetChainInfoCommand = GetChainInfoCommand()
+) : ICommand {
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
-        TODO("Not yet implemented")
+        try {
+            val network = plugin.configs.network
+            val blockchainInfo = bitcoinRPC.makeBitcoinRequest("getblockchaininfo", BlockchainInfoBitcoin::class.java)
+            plugin.log(PluginLog.ERROR, blockchainInfo.chain!!)
+            if (blockchainInfo.chain!! == network) {
+                throw CLightningPluginException(400, "Bitcoin Core and C-lightning are running over different chain.")
+            }
+
+            if (blockchainInfo.isDownloading!!) {
+                alternative.run(plugin, request, response)
+                return
+            }
+            response.apply {
+                add("chain", blockchainInfo.chain!!)
+                add("headercount", blockchainInfo.headerCount!!)
+                add("blockcount", blockchainInfo.blockCount!!)
+                add("ibd", blockchainInfo.isDownloading!!)
+            }
+        } catch (exception: LiteBitcoinRPCException) {
+            plugin.log(PluginLog.ERROR, exception.stackTrace.toString())
+            alternative.run(plugin, request, response)
+        }
     }
 }

@@ -131,7 +131,7 @@ class Plugin : CLightningPlugin() {
             }
         }
 
-        if (prunedMode && bitcoinRpcPass.trim().isEmpty() && bitcoinRpcUser.trim().isEmpty()) {
+        if (prunedMode && bitcoinRpcPass.trim().isNotEmpty() && bitcoinRpcUser.trim().isNotEmpty()) {
             PluginManager.instance.bitcoinPass = bitcoinRpcPass
             PluginManager.instance.bitcoinUser = bitcoinRpcUser
             PluginManager.instance.baseBitcoinUrl = bitcoinBaseUrl
