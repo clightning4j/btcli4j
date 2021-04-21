@@ -67,7 +67,7 @@ class GetChainInfoBtc(
     private fun convertNameToBitcoinCore(chainName: String): String {
         when (chainName) {
             "bitcoin" -> return "main"
-            "testnet" -> return "testnet"
+            "testnet" -> return "test"
             "regtest" -> return "regtest"
         }
         throw CLightningPluginException(400, "Unknown name chain %s".format(chainName))
