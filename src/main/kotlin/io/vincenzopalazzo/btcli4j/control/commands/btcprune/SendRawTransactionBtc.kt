@@ -19,15 +19,38 @@
 package io.vincenzopalazzo.btcli4j.control.commands.btcprune
 
 import io.github.clightning4j.litebtc.LiteBitcoinRPC
+import io.github.clightning4j.litebtc.exceptions.LiteBitcoinRPCException
+import io.github.clightning4j.litebtc.model.generic.Parameters
 import io.vincenzopalazzo.btcli4j.control.commands.ICommand
+import io.vincenzopalazzo.btcli4j.control.commands.esplora.SendRawTransactionCommand
 import jrpc.clightning.plugins.CLightningPlugin
+import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 
 /**
  * @author https://github.com/vincenzopalazzo
  */
-class SendRawTransactionBtc(private val bitcoinRPC: LiteBitcoinRPC) : ICommand {
+class SendRawTransactionBtc(private val bitcoinRPC: LiteBitcoinRPC, private val alternative: SendRawTransactionCommand = SendRawTransactionCommand()) : ICommand {
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
-        TODO("Not yet implemented")
+        try {
+            // TODO support allowhighfees
+            val txRaw = request["tx"].asString
+            val params = Parameters("sendrawtransaction")
+            params.addParameter("hexstring", txRaw)
+            val transactionId = bitcoinRPC.makeBitcoinRequest(params, String::class.java)
+            if (transactionId == null || transactionId.isEmpty()) {
+                plugin.log(PluginLog.ERROR, "The transaction id has a bad format %s".format(transactionId))
+                plugin.log(PluginLog.DEBUG, "Share message to esplora")
+                alternative.run(plugin, request, response)
+                return
+            }
+            response.apply {
+                add("success", transactionId.isNotEmpty()) // TODO validate if it is a txId
+                //add("errmsg", transactionId.isNotEmpty()) // in case of error I will share the content to esplora.
+            }
+        } catch (exception: LiteBitcoinRPCException) {
+            plugin.log(PluginLog.ERROR, exception.stackTraceToString())
+            alternative.run(plugin, request, response)
+        }
     }
 }

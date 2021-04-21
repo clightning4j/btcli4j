@@ -19,15 +19,38 @@
 package io.vincenzopalazzo.btcli4j.control.commands.btcprune
 
 import io.github.clightning4j.litebtc.LiteBitcoinRPC
+import io.github.clightning4j.litebtc.exceptions.LiteBitcoinRPCException
+import io.github.clightning4j.litebtc.model.generic.Parameters
 import io.vincenzopalazzo.btcli4j.control.commands.ICommand
+import io.vincenzopalazzo.btcli4j.control.commands.esplora.GetUtxOutCommand
+import io.vincenzopalazzo.btcli4j.model.bitcoin.UTXOBitcoin
 import jrpc.clightning.plugins.CLightningPlugin
+import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 
 /**
  * @author https://github.com/vincenzopalazzo
  */
-class GetUtxOutBtc(private val bitcoinRPC: LiteBitcoinRPC) : ICommand {
+class GetUtxOutBtc(private val bitcoinRPC: LiteBitcoinRPC, private val alternative: GetUtxOutCommand = GetUtxOutCommand()) : ICommand {
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
-        TODO("Not yet implemented")
+        try {
+            val txId = request["txid"].asString
+            plugin.log(PluginLog.DEBUG, "TxId: $txId")
+            val vOut = request["vout"].asInt
+            plugin.log(PluginLog.DEBUG, "Vout: $vOut")
+            val params = Parameters("gettxout")
+            params.addParameter("txid", txId)
+            params.addParameter("n", vOut)
+            // params.addParameter("include_mempool", true) TODO: double check
+            val getUtxo = bitcoinRPC.makeBitcoinRequest(params, UTXOBitcoin::class.java)
+            // Check if the data are valid, otherwise put the message to esplora
+            response.apply {
+                add("amount", getUtxo.amount)
+                add("script", getUtxo.script!!.hex!!)
+            }
+        } catch (exception: LiteBitcoinRPCException) {
+            plugin.log(PluginLog.ERROR, exception.stackTraceToString())
+            alternative.run(plugin, request, response)
+        }
     }
 }

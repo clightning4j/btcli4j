@@ -19,15 +19,44 @@
 package io.vincenzopalazzo.btcli4j.control.commands.btcprune
 
 import io.github.clightning4j.litebtc.LiteBitcoinRPC
+import io.github.clightning4j.litebtc.exceptions.LiteBitcoinRPCException
+import io.github.clightning4j.litebtc.model.generic.Parameters
 import io.vincenzopalazzo.btcli4j.control.commands.ICommand
+import io.vincenzopalazzo.btcli4j.control.commands.esplora.GetRawBlockByHeightCommand
 import jrpc.clightning.plugins.CLightningPlugin
+import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 
 /**
  * @author https://github.com/vincenzopalazzo
  */
-class GetRawBlockByHeightBtc(private val bitcoinRPC: LiteBitcoinRPC) : ICommand {
+class GetRawBlockByHeightBtc(
+    private val bitcoinRPC: LiteBitcoinRPC,
+    private val alternative: GetRawBlockByHeightCommand = GetRawBlockByHeightCommand()
+) : ICommand {
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
-        TODO("Not yet implemented")
+        try {
+            val hashBlock = bitcoinRPC.makeBitcoinRequest("getblockhash", String::class.java)
+            if (hashBlock == null || hashBlock.isEmpty()) {
+                plugin.log(PluginLog.ERROR, "Bad getblockhash result %s".format(hashBlock))
+                alternative.run(plugin, request, response)
+                return
+            }
+            val params = Parameters("blockhash")
+            params.addParameter("verbose", 0)
+            val hexBlock = bitcoinRPC.makeBitcoinRequest(params, String::class.java)
+            if (hexBlock == null || hexBlock.isEmpty()) {
+                plugin.log(PluginLog.ERROR, "Bad blockhash result %s".format(hashBlock))
+                alternative.run(plugin, request, response)
+                return
+            }
+            response.apply {
+                add("blockhash", hashBlock)
+                add("block", hexBlock)
+            }
+        } catch (exception: LiteBitcoinRPCException) {
+            plugin.log(PluginLog.ERROR, exception.stackTraceToString())
+            alternative.run(plugin, request, response)
+        }
     }
 }

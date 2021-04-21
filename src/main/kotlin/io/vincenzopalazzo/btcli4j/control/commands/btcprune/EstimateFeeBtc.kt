@@ -23,7 +23,6 @@ import io.github.clightning4j.litebtc.exceptions.LiteBitcoinRPCException
 import io.github.clightning4j.litebtc.model.generic.Parameters
 import io.vincenzopalazzo.btcli4j.control.commands.ICommand
 import io.vincenzopalazzo.btcli4j.control.commands.esplora.EstimateFeeCommand
-import io.vincenzopalazzo.btcli4j.control.commands.esplora.GetChainInfoCommand
 import io.vincenzopalazzo.btcli4j.model.bitcoin.EstimateFeeBitcoin
 import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.exceptions.CLightningPluginException
@@ -43,9 +42,10 @@ class EstimateFeeBtc(
             // read this issue https://github.com/ElementsProject/lightning/issues/4473#issue-853325816
             val params = Parameters("estimatesmartfee")
             params.addParameter("conf_target", 6)
-            //params.addParameter("estimate_mode", "CONSERVATIVE")
+            // params.addParameter("estimate_mode", "CONSERVATIVE")
 
             val estimateFee = bitcoinRPC.makeBitcoinRequest(params, EstimateFeeBitcoin::class.java)
+            estimateFee.convertBtcToSat()
 
             response.apply {
                 add("opening", estimateFee.feeRate!!.toInt())
@@ -62,6 +62,5 @@ class EstimateFeeBtc(
             plugin.log(PluginLog.ERROR, ex.message)
             throw CLightningPluginException(400, ex.message)
         }
-
     }
 }

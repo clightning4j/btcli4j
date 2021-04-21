@@ -37,10 +37,11 @@ class GetChainInfoBtc(
 ) : ICommand {
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
         try {
-            val network = plugin.configs.network
+            var network = plugin.configs.network
+            network = convertNameToBitcoinCore(network)
             val blockchainInfo = bitcoinRPC.makeBitcoinRequest("getblockchaininfo", BlockchainInfoBitcoin::class.java)
             plugin.log(PluginLog.ERROR, blockchainInfo.chain!!)
-            if (blockchainInfo.chain!! == network) {
+            if (blockchainInfo.chain!! != network) {
                 throw CLightningPluginException(400, "Bitcoin Core and C-lightning are running over different chain.")
             }
 
@@ -54,9 +55,21 @@ class GetChainInfoBtc(
                 add("blockcount", blockchainInfo.blockCount!!)
                 add("ibd", blockchainInfo.isDownloading!!)
             }
+        } catch (exception: CLightningPluginException) {
+            plugin.log(PluginLog.ERROR, "Wrong chain")
+            throw exception
         } catch (exception: LiteBitcoinRPCException) {
-            plugin.log(PluginLog.ERROR, exception.stackTrace.toString())
+            plugin.log(PluginLog.ERROR, exception.stackTraceToString())
             alternative.run(plugin, request, response)
         }
+    }
+
+    private fun convertNameToBitcoinCore(chainName: String): String {
+        when (chainName) {
+            "bitcoin" -> return "main"
+            "testnet" -> return "testnet"
+            "regtest" -> return "regtest"
+        }
+        throw CLightningPluginException(400, "Unknown name chain %s".format(chainName))
     }
 }
