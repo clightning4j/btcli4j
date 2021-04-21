@@ -46,7 +46,7 @@ class SendRawTransactionBtc(private val bitcoinRPC: LiteBitcoinRPC, private val 
             }
             response.apply {
                 add("success", transactionId.isNotEmpty()) // TODO validate if it is a txId
-                //add("errmsg", transactionId.isNotEmpty()) // in case of error I will share the content to esplora.
+                // add("errmsg", transactionId.isNotEmpty()) // in case of error I will share the content to esplora.
             }
         } catch (exception: LiteBitcoinRPCException) {
             plugin.log(PluginLog.ERROR, exception.stackTraceToString())
