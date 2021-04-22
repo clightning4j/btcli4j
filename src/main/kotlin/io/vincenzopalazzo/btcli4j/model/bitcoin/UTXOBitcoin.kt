@@ -7,6 +7,10 @@ class UTXOBitcoin {
     var amount: Double? = null
     @SerializedName("scriptPubKey")
     val script: ScriptPubKey? = null
+
+    fun convertBtcToSat() {
+        this.amount = this.amount!!.div(10_000_000)
+    }
 }
 
 class ScriptPubKey {

@@ -56,6 +56,7 @@ class GetRawBlockByHeightBtc(
             }
         } catch (exception: LiteBitcoinRPCException) {
             plugin.log(PluginLog.ERROR, exception.stackTraceToString())
+            plugin.log(PluginLog.DEBUG, "GetRawBlockByHeightBtc: Share message to esplora")
             alternative.run(plugin, request, response)
         }
     }

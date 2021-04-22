@@ -50,6 +50,7 @@ class SendRawTransactionBtc(private val bitcoinRPC: LiteBitcoinRPC, private val 
             }
         } catch (exception: LiteBitcoinRPCException) {
             plugin.log(PluginLog.ERROR, exception.stackTraceToString())
+            plugin.log(PluginLog.DEBUG, "SendRawTransactionBtc: Share message to esplora")
             alternative.run(plugin, request, response)
         }
     }

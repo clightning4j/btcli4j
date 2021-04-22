@@ -43,6 +43,7 @@ class GetUtxOutBtc(private val bitcoinRPC: LiteBitcoinRPC, private val alternati
             params.addParameter("n", vOut)
             // params.addParameter("include_mempool", true) TODO: double check
             val getUtxo = bitcoinRPC.makeBitcoinRequest(params, UTXOBitcoin::class.java)
+            getUtxo.convertBtcToSat()
             // Check if the data are valid, otherwise put the message to esplora
             response.apply {
                 add("amount", getUtxo.amount)
@@ -50,6 +51,7 @@ class GetUtxOutBtc(private val bitcoinRPC: LiteBitcoinRPC, private val alternati
             }
         } catch (exception: LiteBitcoinRPCException) {
             plugin.log(PluginLog.ERROR, exception.stackTraceToString())
+            plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Share message to esplora")
             alternative.run(plugin, request, response)
         }
     }

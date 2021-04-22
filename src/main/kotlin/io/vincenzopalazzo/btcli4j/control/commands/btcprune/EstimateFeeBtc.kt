@@ -58,9 +58,9 @@ class EstimateFeeBtc(
                 add("max_acceptable", estimateFee.feeRate!!.toInt() * 10)
             }
         } catch (ex: LiteBitcoinRPCException) {
-            ex.printStackTrace()
-            plugin.log(PluginLog.ERROR, ex.message)
-            throw CLightningPluginException(400, ex.message)
+            plugin.log(PluginLog.ERROR, ex.stackTraceToString())
+            plugin.log(PluginLog.DEBUG, "EstimateFeeBtc: Share message to esplora")
+            alternative.run(plugin, request, response)
         }
     }
 }

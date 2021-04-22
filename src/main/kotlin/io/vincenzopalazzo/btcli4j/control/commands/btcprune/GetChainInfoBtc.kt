@@ -60,6 +60,7 @@ class GetChainInfoBtc(
             throw exception
         } catch (exception: LiteBitcoinRPCException) {
             plugin.log(PluginLog.ERROR, exception.stackTraceToString())
+            plugin.log(PluginLog.DEBUG, "GetChainInfoBtc: Share message to esplora")
             alternative.run(plugin, request, response)
         }
     }
