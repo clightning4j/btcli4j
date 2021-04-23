@@ -25,7 +25,6 @@ import io.vincenzopalazzo.btcli4j.control.commands.ICommand
 import io.vincenzopalazzo.btcli4j.control.commands.esplora.EstimateFeeCommand
 import io.vincenzopalazzo.btcli4j.model.bitcoin.EstimateFeeBitcoin
 import jrpc.clightning.plugins.CLightningPlugin
-import jrpc.clightning.plugins.exceptions.CLightningPluginException
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 
