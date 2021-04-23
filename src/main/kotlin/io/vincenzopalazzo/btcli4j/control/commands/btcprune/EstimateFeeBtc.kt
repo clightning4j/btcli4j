@@ -45,7 +45,7 @@ class EstimateFeeBtc(
 
             val estimateFee = bitcoinRPC.makeBitcoinRequest(params, EstimateFeeBitcoin::class.java)
             estimateFee.convertBtcToSat()
-
+            plugin.log(PluginLog.DEBUG, "Estimate fee calculation from bitcoin core: %d".format(estimateFee.feeRate))
             response.apply {
                 add("opening", estimateFee.feeRate!!.toInt())
                 add("mutual_close", estimateFee.feeRate!!.toInt())
