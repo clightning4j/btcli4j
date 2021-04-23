@@ -56,7 +56,7 @@ class GetChainInfoBtc(
                 add("ibd", blockchainInfo.isDownloading!!)
             }
         } catch (exception: CLightningPluginException) {
-            plugin.log(PluginLog.ERROR, "Wrong chain")
+            plugin.log(PluginLog.ERROR, "GetChainInfoBtc: Wrong chain")
             throw exception
         } catch (exception: LiteBitcoinRPCException) {
             plugin.log(PluginLog.ERROR, exception.stackTraceToString())

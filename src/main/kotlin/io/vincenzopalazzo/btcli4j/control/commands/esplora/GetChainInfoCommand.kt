@@ -39,7 +39,7 @@ class GetChainInfoCommand : ICommand {
             )
             plugin.log(PluginLog.DEBUG, reqGenesisBlock!!.url.toUrl())
             val genesisBlock: String = HttpRequestFactory.execRequest(plugin, reqGenesisBlock).utf8()
-            plugin.log(PluginLog.DEBUG, "Genesis block %s".format(genesisBlock))
+            plugin.log(PluginLog.DEBUG, "GetChainInfoCommand: Genesis block %s".format(genesisBlock))
 
             val reqBlockchainHeight = HttpRequestFactory.createRequest(
                 "%s/blocks/tip/height".format(queryUrl),
@@ -48,9 +48,9 @@ class GetChainInfoCommand : ICommand {
             val blockCount: Int
             if (reqBlockchainHeight != null) {
                 blockCount = HttpRequestFactory.execRequest(plugin, reqBlockchainHeight).utf8().toInt()
-                plugin.log(PluginLog.DEBUG, "Block count = %s".format(blockCount.toString()))
+                plugin.log(PluginLog.DEBUG, "GetChainInfoCommand: GetChainInfoCommand: Block count = %s".format(blockCount.toString()))
             } else {
-                plugin.log(PluginLog.ERROR, "Request for genesis block null!!!")
+                plugin.log(PluginLog.ERROR, "GetChainInfoCommand: Request for genesis block null!!!")
                 throw CLightningPluginException(400, "Request for genesis block null!!!")
             }
 
@@ -69,7 +69,7 @@ class GetChainInfoCommand : ICommand {
                 add("ibd", false)
             }
         } catch (ex: Exception) {
-            plugin.log(PluginLog.WARNING, ex.localizedMessage)
+            plugin.log(PluginLog.WARNING, "GetChainInfoCommand terminate with an exception\n %s".format(ex.stackTraceToString()))
             throw CLightningPluginException(400, ex.localizedMessage)
         }
     }

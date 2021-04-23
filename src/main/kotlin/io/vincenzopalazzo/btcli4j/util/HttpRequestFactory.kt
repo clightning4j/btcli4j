@@ -109,8 +109,7 @@ object HttpRequestFactory {
                 val response = makeRequest(request)
                 if (isValid(response)) {
                     val result = response.body!!.byteString()
-                    plugin.log(PluginLog.DEBUG, "During http request to URL ${request.url}")
-                    plugin.log(PluginLog.DEBUG, "I have the following result ${result.utf8()}")
+                    plugin.log(PluginLog.DEBUG, "Request to ${request.url} with the following result $result")
                     return result
                 }
                 // there are some cases where the invalid answer can be accepted from lightnind

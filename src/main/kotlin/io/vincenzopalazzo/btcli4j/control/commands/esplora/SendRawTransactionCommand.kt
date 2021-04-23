@@ -40,7 +40,6 @@ class SendRawTransactionCommand : ICommand {
             )!!
 
             val resSendTx = HttpRequestFactory.execRequest(plugin, reqSendTx).utf8()
-
             response.apply {
                 add("success", resSendTx.isNotEmpty()) // TODO validate if it is a txId
                 add("errmsg", resSendTx.isNotEmpty()) // check this code

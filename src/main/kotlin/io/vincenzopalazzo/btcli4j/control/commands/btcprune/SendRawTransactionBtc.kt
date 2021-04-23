@@ -39,8 +39,8 @@ class SendRawTransactionBtc(private val bitcoinRPC: LiteBitcoinRPC, private val 
             params.addParameter("hexstring", txRaw)
             val transactionId = bitcoinRPC.makeBitcoinRequest(params, String::class.java)
             if (transactionId == null || transactionId.isEmpty()) {
-                plugin.log(PluginLog.ERROR, "The transaction id has a bad format %s".format(transactionId))
-                plugin.log(PluginLog.DEBUG, "Share message to esplora")
+                plugin.log(PluginLog.DEBUG, "SendRawTransactionBtc: The transaction id has a bad format %s".format(transactionId))
+                plugin.log(PluginLog.DEBUG, "SendRawTransactionBtc: Share message to esplora")
                 alternative.run(plugin, request, response)
                 return
             }

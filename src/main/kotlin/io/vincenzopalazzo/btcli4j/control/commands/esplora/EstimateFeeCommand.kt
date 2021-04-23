@@ -41,11 +41,11 @@ class EstimateFeeCommand : ICommand {
 
             val resEstimateFee = HttpRequestFactory.execRequest(plugin, reqEstimateFee).utf8()
             if (resEstimateFee.isNotEmpty() && !reqEstimateFee.equals("{}")) {
-                plugin.log(PluginLog.DEBUG, "Estimate fee $resEstimateFee")
+                plugin.log(PluginLog.DEBUG, "EstimateFeeCommand: Estimate fee $resEstimateFee")
                 estimateFee = JSONConverter.deserialize(resEstimateFee, EstimateFeeModel::class.java)
             } else {
-                plugin.log(PluginLog.ERROR, "Estimate fee empty response without object !!!")
-                throw CLightningPluginException(400, "Estimate fee empty from http response")
+                plugin.log(PluginLog.ERROR, "EstimateFeeCommand: Estimate fee empty response without object !!!")
+                throw CLightningPluginException(400, "EstimateFeeCommand: Estimate fee empty from http response")
             }
 
             if (!estimateFee.isEmpty()) {

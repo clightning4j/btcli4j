@@ -45,8 +45,8 @@ class GetUtxOutBtc(private val bitcoinRPC: LiteBitcoinRPC, private val alternati
             val getUtxo = bitcoinRPC.makeBitcoinRequest(params, UTXOBitcoin::class.java)
             getUtxo.convertBtcToSat()
             // Check if the data are valid, otherwise put the message to esplora
-            plugin.log(PluginLog.DEBUG, "Amount tx: %d".format(getUtxo.amount!!))
-            plugin.log(PluginLog.DEBUG, "Script hex: %d".format(getUtxo.script!!.hex!!))
+            plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Amount tx: " + getUtxo.amount!!)
+            plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Script hex: %s".format(getUtxo.script!!.hex!!))
             response.apply {
                 add("amount", getUtxo.amount)
                 add("script", getUtxo.script.hex!!)

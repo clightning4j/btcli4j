@@ -40,7 +40,7 @@ class GetRawBlockByHeightCommand : ICommand {
             )!!
             // get block reference by height
             val resBlockHash = HttpRequestFactory.execRequest(plugin, blockWithHeight).utf8()
-            plugin.log(PluginLog.DEBUG, "$blockWithHeight Hash $resBlockHash")
+            plugin.log(PluginLog.DEBUG, "GetRawBlockByHeightCommand: $blockWithHeight Hash $resBlockHash")
             val hexBlock: String
             if (resBlockHash.isNotEmpty() && resBlockHash != "Block not found") {
                 // get the raw block by block hash
@@ -64,7 +64,7 @@ class GetRawBlockByHeightCommand : ICommand {
                 returnResponse(response)
             }
         } catch (ex: Exception) {
-            plugin.log(PluginLog.WARNING, ex.message)
+            plugin.log(PluginLog.WARNING, "GetRawBlockByHeightCommand has some exception\n".format(ex.stackTraceToString()))
             // throw CLightningPluginException(ex.cause)
             returnResponse(response)
         }
