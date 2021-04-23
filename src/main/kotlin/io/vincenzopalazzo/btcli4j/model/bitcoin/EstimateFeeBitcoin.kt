@@ -9,6 +9,6 @@ class EstimateFeeBitcoin {
     var blocks: Long? = null
 
     fun convertBtcToSat() {
-        this.feeRate = this.feeRate!!.div(10_000_000)
+        this.feeRate = this.feeRate!! * 10_000_000
     }
 }

@@ -9,7 +9,7 @@ class UTXOBitcoin {
     val script: ScriptPubKey? = null
 
     fun convertBtcToSat() {
-        this.amount = this.amount!!.div(10_000_000)
+        this.amount = this.amount!! * 10_000_000
     }
 }
 
