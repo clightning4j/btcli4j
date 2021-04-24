@@ -35,9 +35,9 @@ class GetUtxOutBtc(private val bitcoinRPC: LiteBitcoinRPC, private val alternati
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
         try {
             val txId = request["txid"].asString
-            plugin.log(PluginLog.DEBUG, "TxId: $txId")
+            plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: TxId -> $txId")
             val vOut = request["vout"].asInt
-            plugin.log(PluginLog.DEBUG, "Vout: $vOut")
+            plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Vout -> $vOut")
             val params = Parameters("gettxout")
             params.addParameter("txid", txId)
             params.addParameter("n", vOut)

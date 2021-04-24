@@ -54,6 +54,11 @@ class GetUtxOutCommand : ICommand {
                         add("amount", transactionOutput.value)
                         add("script", transactionOutput.scriptPubKey!!)
                     }
+                    return;
+                }
+                response.apply {
+                    add("amount", null)
+                    add("script", null)
                 }
             }
         } catch (ex: Exception) {
