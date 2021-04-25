@@ -19,6 +19,7 @@
 package io.vincenzopalazzo.btcli4j.control.commands.btcprune
 
 import io.github.clightning4j.litebtc.LiteBitcoinRPC
+import io.github.clightning4j.litebtc.exceptions.BitcoinCoreException
 import io.github.clightning4j.litebtc.exceptions.LiteBitcoinRPCException
 import io.github.clightning4j.litebtc.model.generic.Parameters
 import io.vincenzopalazzo.btcli4j.control.commands.ICommand
@@ -51,16 +52,7 @@ class EstimateFeeBtc(
                 for (error in estimateFee.errors!!) {
                     plugin.log(PluginLog.ERROR, "EstimateFeeBtc: %s".format(error))
                 }
-                response.apply {
-                    add("opening", null)
-                    add("mutual_close", null)
-                    add("unilateral_close", null)
-                    add("delayed_to_us", null)
-                    add("htlc_resolution", null)
-                    add("penalty", null)
-                    add("min_acceptable", null)
-                    add("max_acceptable", null)
-                }
+                this.returnNullFeee(response)
                 return
             }
 
@@ -76,10 +68,26 @@ class EstimateFeeBtc(
                 add("min_acceptable", estimateFee.feeRate!!.toInt() / 2)
                 add("max_acceptable", estimateFee.feeRate!!.toInt() * 10)
             }
+        } catch (bitcoinEx: BitcoinCoreException) {
+            plugin.log(PluginLog.ERROR, "EstimateFeeBtc: terminate bitcoin core with error: %s".format(bitcoinEx.message))
+            this.returnNullFeee(response)
         } catch (ex: LiteBitcoinRPCException) {
             plugin.log(PluginLog.ERROR, ex.stackTraceToString())
             plugin.log(PluginLog.DEBUG, "EstimateFeeBtc: Share message to esplora")
             alternative.run(plugin, request, response)
+        }
+    }
+
+    private fun returnNullFeee(response: CLightningJsonObject) {
+        response.apply {
+            add("opening", null)
+            add("mutual_close", null)
+            add("unilateral_close", null)
+            add("delayed_to_us", null)
+            add("htlc_resolution", null)
+            add("penalty", null)
+            add("min_acceptable", null)
+            add("max_acceptable", null)
         }
     }
 }

@@ -19,6 +19,7 @@
 package io.vincenzopalazzo.btcli4j.control.commands.btcprune
 
 import io.github.clightning4j.litebtc.LiteBitcoinRPC
+import io.github.clightning4j.litebtc.exceptions.BitcoinCoreException
 import io.github.clightning4j.litebtc.exceptions.LiteBitcoinRPCException
 import io.vincenzopalazzo.btcli4j.control.commands.ICommand
 import io.vincenzopalazzo.btcli4j.control.commands.esplora.GetChainInfoCommand
@@ -27,6 +28,7 @@ import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.exceptions.CLightningPluginException
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
+import java.lang.Exception
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -46,6 +48,7 @@ class GetChainInfoBtc(
             }
 
             if (blockchainInfo.isDownloading!!) {
+                plugin.log(PluginLog.DEBUG, "GetChainInfoBtc: Share message to esplora")
                 alternative.run(plugin, request, response)
                 return
             }
@@ -58,8 +61,15 @@ class GetChainInfoBtc(
         } catch (exception: CLightningPluginException) {
             plugin.log(PluginLog.ERROR, "GetChainInfoBtc: Wrong chain")
             throw exception
-        } catch (exception: LiteBitcoinRPCException) {
-            plugin.log(PluginLog.ERROR, exception.stackTraceToString())
+        } catch (exception: Exception) {
+            when (exception) {
+                is BitcoinCoreException -> {
+                    plugin.log(PluginLog.ERROR, "GetChainInfoBtc: terminate bitcoin core with error: %s".format(exception.message))
+                }
+                is LiteBitcoinRPCException -> {
+                    plugin.log(PluginLog.ERROR, exception.stackTraceToString())
+                }
+            }
             plugin.log(PluginLog.DEBUG, "GetChainInfoBtc: Share message to esplora")
             alternative.run(plugin, request, response)
         }

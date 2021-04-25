@@ -19,6 +19,7 @@
 package io.vincenzopalazzo.btcli4j.control.commands.btcprune
 
 import io.github.clightning4j.litebtc.LiteBitcoinRPC
+import io.github.clightning4j.litebtc.exceptions.BitcoinCoreException
 import io.github.clightning4j.litebtc.exceptions.LiteBitcoinRPCException
 import io.github.clightning4j.litebtc.model.generic.Parameters
 import io.vincenzopalazzo.btcli4j.control.commands.ICommand
@@ -26,6 +27,7 @@ import io.vincenzopalazzo.btcli4j.control.commands.esplora.SendRawTransactionCom
 import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
+import java.lang.Exception
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -48,8 +50,15 @@ class SendRawTransactionBtc(private val bitcoinRPC: LiteBitcoinRPC, private val 
                 add("success", transactionId.isNotEmpty()) // TODO validate if it is a txId
                 // add("errmsg", transactionId.isNotEmpty()) // in case of error I will share the content to esplora.
             }
-        } catch (exception: LiteBitcoinRPCException) {
-            plugin.log(PluginLog.ERROR, exception.stackTraceToString())
+        } catch (exception: Exception) {
+            when (exception) {
+                is BitcoinCoreException -> {
+                    plugin.log(PluginLog.ERROR, "GetChainInfoBtc: terminate bitcoin core with error: %s".format(exception.message))
+                }
+                is LiteBitcoinRPCException -> {
+                    plugin.log(PluginLog.ERROR, exception.stackTraceToString())
+                }
+            }
             plugin.log(PluginLog.DEBUG, "SendRawTransactionBtc: Share message to esplora")
             alternative.run(plugin, request, response)
         }
