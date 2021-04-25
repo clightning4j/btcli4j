@@ -44,6 +44,26 @@ class EstimateFeeBtc(
             // params.addParameter("estimate_mode", "CONSERVATIVE")
 
             val estimateFee = bitcoinRPC.makeBitcoinRequest(params, EstimateFeeBitcoin::class.java)
+
+            if (estimateFee.errors?.isNotEmpty() == true) {
+                // TODO this can cause a loop? maybe
+                plugin.log(PluginLog.ERROR, "Error during the fee estimation")
+                for (error in estimateFee.errors!!) {
+                    plugin.log(PluginLog.ERROR, "EstimateFeeBtc: %s".format(error))
+                }
+                response.apply {
+                    add("opening", null)
+                    add("mutual_close", null)
+                    add("unilateral_close", null)
+                    add("delayed_to_us", null)
+                    add("htlc_resolution", null)
+                    add("penalty", null)
+                    add("min_acceptable", null)
+                    add("max_acceptable", null)
+                }
+                return
+            }
+
             estimateFee.convertBtcToSat()
             plugin.log(PluginLog.DEBUG, "EstimateFeeBtc: Estimate fee calculation from bitcoin core: %d".format(estimateFee.feeRate!!.toInt()))
             response.apply {
