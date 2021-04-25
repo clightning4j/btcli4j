@@ -24,6 +24,7 @@ import io.github.clightning4j.litebtc.model.generic.Parameters
 import io.vincenzopalazzo.btcli4j.control.commands.ICommand
 import io.vincenzopalazzo.btcli4j.control.commands.esplora.GetUtxOutCommand
 import io.vincenzopalazzo.btcli4j.model.bitcoin.UTXOBitcoin
+import io.vincenzopalazzo.btcli4j.util.JSONConverter
 import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
@@ -45,7 +46,8 @@ class GetUtxOutBtc(private val bitcoinRPC: LiteBitcoinRPC, private val alternati
             val getUtxo = bitcoinRPC.makeBitcoinRequest(params, UTXOBitcoin::class.java)
             getUtxo.convertBtcToSat()
             // Check if the data are valid, otherwise put the message to esplora
-            plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Amount tx: " + getUtxo.amount!!.toInt())
+            plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: answer from gettxout: " + JSONConverter.serialize(getUtxo))
+            plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Amount tx (not conv to integer): " + getUtxo.amount!!)
             plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Script hex: %s".format(getUtxo.script!!.hex!!))
             response.apply {
                 add("amount", getUtxo.amount!!.toInt())
@@ -56,5 +58,6 @@ class GetUtxOutBtc(private val bitcoinRPC: LiteBitcoinRPC, private val alternati
             plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Share message to esplora")
             alternative.run(plugin, request, response)
         }
+        plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: answer is: " + JSONConverter.serialize(response))
     }
 }
