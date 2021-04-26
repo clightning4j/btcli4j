@@ -37,14 +37,18 @@ class GetRawBlockByHeightBtc(
 ) : ICommand {
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
         try {
-            val hashBlock = bitcoinRPC.makeBitcoinRequest("getblockhash", String::class.java)
+            val heightRequested = request["height"].asLong
+            var params = Parameters("getblockhash")
+            params.addParameter("height", heightRequested)
+            val hashBlock = bitcoinRPC.makeBitcoinRequest(params, String::class.java)
             if (hashBlock == null || hashBlock.isEmpty()) {
                 plugin.log(PluginLog.ERROR, "GetRawBlockByHeightBtc: Bad getblockhash result %s".format(hashBlock))
                 alternative.run(plugin, request, response)
                 return
             }
-            val params = Parameters("blockhash")
-            params.addParameter("verbose", 0)
+            params = Parameters("getblock")
+            params.addParameter("blockhash", hashBlock)
+            params.addParameter("verbose", 0) // return only the string
             val hexBlock = bitcoinRPC.makeBitcoinRequest(params, String::class.java)
             if (hexBlock == null || hexBlock.isEmpty()) {
                 plugin.log(PluginLog.ERROR, "GetRawBlockByHeightBtc: Bad blockhash result %s".format(hashBlock))
