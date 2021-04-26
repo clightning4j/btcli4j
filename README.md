@@ -75,7 +75,7 @@ before submit the code check the Kotlin format with the following command on the
 
 ## Built with
 
-- [JRPClightning](https://github.com/vincenzopalazzo/JRPClightning) : 
+- [JRPClightning](https://github.com/vincenzopalazzo/JRPClightning)
 - [lite-bitcoin-rpc](https://github.com/clightning4j/lite-bitcoin-rpc)
 
 ## License

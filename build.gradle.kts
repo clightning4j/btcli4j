@@ -2,6 +2,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.4.30"
     id("org.jmailen.kotlinter") version "3.3.0"
     application
+    maven
 }
 
 configurations.all {
