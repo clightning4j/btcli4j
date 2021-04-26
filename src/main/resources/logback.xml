@@ -23,7 +23,7 @@
   </appender>
 
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-    <file>${user.home}/clightning_java_plugin/btcli4j.log</file>
+    <file>${user.home}/clightning4j/btcli4j.log</file>
     <append>true</append>
     <!-- set immediateFlush to false for much higher logging throughput -->
     <immediateFlush>true</immediateFlush>
@@ -34,17 +34,17 @@
     </encoder>
   </appender>
 
-  <root level="DEBUG">
+  <root level="WARNING">
     <!-- <appender-ref ref="STDOUT" /> -->
     <appender-ref ref="FILE" />
   </root>
 
-  <logger name="j.service.socket.UnixDomainSocketRpc" level="DEBUG">
+  <logger name="j.service.socket.UnixDomainSocketRpc" level="WARNING">
     <!-- <appender-ref ref="STDOUT" /> -->
     <appender-ref ref="FILE" />
   </logger>
 
-  <logger name="jrpc.clightning.plugins" level="DEBUG">
+  <logger name="jrpc.clightning.plugins" level="WARNING">
     <appender-ref ref="FILE" />
     <!--  <appender-ref ref="STDOUT" /> -->
   </logger>
