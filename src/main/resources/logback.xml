@@ -35,15 +35,17 @@
   </appender>
 
   <root level="DEBUG">
-    <appender-ref ref="STDOUT" />
+    <!-- <appender-ref ref="STDOUT" /> -->
     <appender-ref ref="FILE" />
   </root>
 
   <logger name="j.service.socket.UnixDomainSocketRpc" level="DEBUG">
-    <appender-ref ref="STDOUT" />
+    <!-- <appender-ref ref="STDOUT" /> -->
+    <appender-ref ref="FILE" />
   </logger>
 
   <logger name="jrpc.clightning.plugins" level="DEBUG">
     <appender-ref ref="FILE" />
+    <!--  <appender-ref ref="STDOUT" /> -->
   </logger>
 </configuration>
