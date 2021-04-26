@@ -19,6 +19,7 @@
 package io.vincenzopalazzo.btcli4j.control.commands.btcprune
 
 import io.github.clightning4j.litebtc.LiteBitcoinRPC
+import io.github.clightning4j.litebtc.exceptions.BitcoinCoreException
 import io.github.clightning4j.litebtc.exceptions.LiteBitcoinRPCException
 import io.github.clightning4j.litebtc.model.generic.Parameters
 import io.vincenzopalazzo.btcli4j.control.commands.ICommand
@@ -28,6 +29,7 @@ import io.vincenzopalazzo.btcli4j.util.JSONConverter
 import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
+import java.lang.Exception
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -44,6 +46,15 @@ class GetUtxOutBtc(private val bitcoinRPC: LiteBitcoinRPC, private val alternati
             params.addParameter("n", vOut)
             // params.addParameter("include_mempool", true) TODO: double check
             val getUtxo = bitcoinRPC.makeBitcoinRequest(params, UTXOBitcoin::class.java)
+            //TODO: bitcoin core should return an error?
+            if (getUtxo.amount == null || getUtxo.script == null) {
+                plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Received undefined response, return a null reponse")
+                response.apply {
+                    add("amount", null)
+                    add("script", null)
+                }
+                return
+            }
             getUtxo.convertBtcToSat()
             // Check if the data are valid, otherwise put the message to esplora
             plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: answer from gettxout: " + JSONConverter.serialize(getUtxo))
@@ -53,9 +64,15 @@ class GetUtxOutBtc(private val bitcoinRPC: LiteBitcoinRPC, private val alternati
                 add("amount", getUtxo.amount!!.toInt())
                 add("script", getUtxo.script.hex!!)
             }
+        } catch (bitcoinEx: BitcoinCoreException) {
+            plugin.log(PluginLog.ERROR, "GetRawBlockByHeightBtc: terminate bitcoin core with error: %s".format(bitcoinEx.message))
+            response.apply {
+                add("amount", null)
+                add("script", null)
+            }
         } catch (exception: LiteBitcoinRPCException) {
             plugin.log(PluginLog.ERROR, exception.stackTraceToString())
-            plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Share message to esplora")
+            plugin.log(PluginLog.DEBUG, "GetRawBlockByHeightBtc: Share message to esplora")
             alternative.run(plugin, request, response)
         }
         plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: answer is: " + JSONConverter.serialize(response))
