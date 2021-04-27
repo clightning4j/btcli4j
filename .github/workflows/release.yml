@@ -1,4 +1,4 @@
-name: Java CI
+name: Build relase for different JDK
 
 on:
   push:
