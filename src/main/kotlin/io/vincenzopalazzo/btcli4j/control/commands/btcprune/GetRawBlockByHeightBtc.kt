@@ -1,6 +1,6 @@
 /**
  *  C-lightning plugin to override Bitcoin backend plugin.
- *  Copyright (C) 2020 Vincenzo Palazzo vincenzopalazzodev@gmail.com
+ *  Copyright (C) 2020-2021 Vincenzo Palazzo vincenzopalazzodev@gmail.com
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ class GetRawBlockByHeightBtc(
             }
         } catch (bitcoinEx: BitcoinCoreException) {
             // TODO: this should be not throws, because Bitcoin core return an exception with all the propriety null, also the error.
-            plugin.log(PluginLog.ERROR, "GetRawBlockByHeightBtc: terminate bitcoin core with error: %s".format(bitcoinEx.message))
+            plugin.log(PluginLog.DEBUG, "GetRawBlockByHeightBtc: terminate bitcoin core with error: %s".format(bitcoinEx.message))
             response.apply {
                 add("blockhash", null)
                 add("block", null)

@@ -1,6 +1,6 @@
 /**
  *  C-lightning plugin to override Bitcoin backend plugin.
- *  Copyright (C) 2020 Vincenzo Palazzo vincenzopalazzodev@gmail.com
+ *  Copyright (C) 2020-2021 Vincenzo Palazzo vincenzopalazzodev@gmail.com
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ import io.vincenzopalazzo.btcli4j.util.JSONConverter
 import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
-import java.lang.Exception
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -46,7 +45,7 @@ class GetUtxOutBtc(private val bitcoinRPC: LiteBitcoinRPC, private val alternati
             params.addParameter("n", vOut)
             // params.addParameter("include_mempool", true) TODO: double check
             val getUtxo = bitcoinRPC.makeBitcoinRequest(params, UTXOBitcoin::class.java)
-            //TODO: bitcoin core should return an error?
+            // TODO: bitcoin core should return an error?
             if (getUtxo.amount == null || getUtxo.script == null) {
                 plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Received undefined response, return a null reponse")
                 response.apply {

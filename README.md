@@ -1,6 +1,8 @@
 ## Btcli4j
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/clightning4j/btcli4j/Java%20CI?style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/clightning4j/btcli4j/Java%20CI?style=flat-square)
+![Esplora support](https://img.shields.io/badge/esplora-supported-gren?style=flat-square)
+![Pruning mode](https://img.shields.io/badge/prune-supported-gren?style=flat-square)
 
 It is a [c-lightning](https://lightning.readthedocs.io/index.html) plugin to override Bitcoin backend plugin with [esplora](https://github.com/Blockstream/esplora) 
 powered by [Blockstream](https://blockstream.com/).
@@ -16,10 +18,16 @@ So, the plugin will support the complete backend with esplora (only) and the com
 
 - [X] Bitcoin (Mainet (Be cautious) and Testnet)
 - [X] Liquid
+- [X] Bitcoin Core pruning mode (Mainet (Be cautious) and Testnet)
+- [X] Bitcoin Core remote call (have bitcoin in another location of your lightningd node) (Mainet (Be cautious) and Testnet)
+- [ ] Litecoin
+- [ ] Liquid
 
 ## Status
 
-The plugin at the moment is under developing, but it should support the esplora backend (on testnet).
+The plugin is in Beta stage, this mean that is waiting for the User Review and testing, good tested on bitcoin testnet
+but not on mainet, because I have put inside only small amount of found that available at the moment, if you want support 
+the project consider to look in the section [Support]()
 
 If you want test it all feedback are welcome! Feel free to open an issue or a PR or in addition, you can send
 email to [vincenzopalazzodev@gmail.com](mailito://vincenzopalazzodev@gmail.com)
@@ -49,8 +57,17 @@ with `plugin=/PATH/bash/file` or use the command line `--plugin=/path/bash/file`
 
 - btcli4j-proxy: Indicate the proxy address, by default is: "127.0.0.1:9050".
 - btcli4j-proxy-enable: A flag option, it help the user to enable the tor socket, by default it is used the same configuration of c-lightning.
+- btcli4j-pruned: A flag option that tell to plugin to ran in pruning mode
+- bitcoin-rpcurl: A string option that is the url of Bitcoin RPC interface, usually `http://127.0.0.1:8332` for mainet and `http://127.0.0.1:18332` for testnet
+- bitcoin-rpcuser: A string option that is the user to make the login in Bitcoin core
+- bitcoin-rpcpassword: A string option that is the password to make the login in Bitcoin core
 
-A complete example is
+P.S: some of Bitcoin propriety are the same of the C-lightning propriety, these mean that yuo need to redefine only a ``bitcoin-rpcurl`` propriety, and put
+at the startup of the lightning node the flag `btcli4j-pruned`
+
+### Esplora API config
+
+A complete example to run with Esplora API is reported below
 
 ```bash
 lightningd --disable-plugin bcli
@@ -60,6 +77,22 @@ The command above, run the lightningd with the lightnind configuration, this mea
 additional configuration to the command line.
 
 However, you can use the command line to customize the plugin behaviors.
+
+### Bitcoin Pruning mode config
+
+```bash
+lightningd --disable-plugin bcli --btcli4j-pruned
+```
+
+With the following clightning config
+
+```bash
+...
+bitcoin-rpcuser=user
+bitcoin-rpcpassword=pass
+bitcoin-rpcurl=http://127.0.0.1:18332
+....
+```
 
 ## Code Style
 [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/)
@@ -86,7 +119,7 @@ before submit the code check the Kotlin format with the following command on the
 
  It is a c-lightning plugin to override Bitcoin backend plugin with esplora.
 
- Copyright (C) 2020 Vincenzo Palazzo vincenzopalazzodev@gmail.com
+ Copyright (C) 2020-2021 Vincenzo Palazzo vincenzopalazzodev@gmail.com
  
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
