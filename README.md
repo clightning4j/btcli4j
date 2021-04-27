@@ -111,6 +111,14 @@ before submit the code check the Kotlin format with the following command on the
 - [JRPClightning](https://github.com/vincenzopalazzo/JRPClightning)
 - [lite-bitcoin-rpc](https://github.com/clightning4j/lite-bitcoin-rpc)
 
+## Support
+If you like the library and want to support it, please considerer to donate with the following system
+
+
+- [liberapay.com/vincenzopalazzo](https://liberapay.com/vincenzopalazzo)
+- [3BQ8qbn8hLdmBKEjt1Hj1Z6SiDsnjJurfU](bitcoin:3BQ8qbn8hLdmBKEjt1Hj1Z6SiDsnjJurfU)
+- [Github support](https://github.com/sponsors/vincenzopalazzo)
+
 ## License
 
 <div align="center">
