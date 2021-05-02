@@ -92,10 +92,25 @@ class GetChainInfoBtc(
 class CheckStatusBitcoinCore(private val bitcoinRPC: LiteBitcoinRPC, private val plugin: CLightningPlugin, private val timeout: Long = 60000) : Runnable {
     override fun run() {
         while (PluginManager.instance.isDownloading) {
-            val info = bitcoinRPC.makeBitcoinRequest("", BlockchainInfoBitcoin::class.java)
-            plugin.log(PluginLog.DEBUG, "Status bitcoin core: %s".format(info.isDownloading))
-            PluginManager.instance.isDownloading = info.isDownloading!!
-            Thread.sleep(timeout)
+            try {
+                val info = bitcoinRPC.makeBitcoinRequest("getblockchaininfo", BlockchainInfoBitcoin::class.java)
+                plugin.log(PluginLog.DEBUG, "GetChainInfoBtc: Status bitcoin core in the check thread: %s".format(info.isDownloading!!.toString()))
+                PluginManager.instance.isDownloading = info.isDownloading!!
+            } catch (exception: Exception) {
+                when (exception) {
+                    is BitcoinCoreException -> {
+                        plugin.log(
+                            PluginLog.ERROR,
+                            "GetChainInfoBtc: terminate bitcoin core in the check thread with error: %s".format(exception.message)
+                        )
+                    }
+                    is LiteBitcoinRPCException -> {
+                        plugin.log(PluginLog.ERROR, "GetChainInfoBtc: Exception in the check thread\n" + exception.stackTraceToString())
+                    }
+                }
+            } finally {
+                Thread.sleep(timeout)
+            }
         }
     }
 }
