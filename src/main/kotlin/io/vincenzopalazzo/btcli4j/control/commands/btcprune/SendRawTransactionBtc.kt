@@ -24,6 +24,7 @@ import io.github.clightning4j.litebtc.exceptions.LiteBitcoinRPCException
 import io.github.clightning4j.litebtc.model.generic.Parameters
 import io.vincenzopalazzo.btcli4j.control.commands.ICommand
 import io.vincenzopalazzo.btcli4j.control.commands.esplora.SendRawTransactionCommand
+import io.vincenzopalazzo.btcli4j.util.PluginManager
 import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
@@ -34,6 +35,11 @@ import java.lang.Exception
  */
 class SendRawTransactionBtc(private val bitcoinRPC: LiteBitcoinRPC, private val alternative: SendRawTransactionCommand = SendRawTransactionCommand()) : ICommand {
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
+        if (PluginManager.instance.isDownloading) {
+            plugin.log(PluginLog.DEBUG, "SendRawTransactionBtc: Share message to esplora")
+            alternative.run(plugin, request, response)
+            return
+        }
         try {
             // TODO support allowhighfees
             val txRaw = request["tx"].asString

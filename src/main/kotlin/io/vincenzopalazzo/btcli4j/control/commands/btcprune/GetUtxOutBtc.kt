@@ -26,6 +26,7 @@ import io.vincenzopalazzo.btcli4j.control.commands.ICommand
 import io.vincenzopalazzo.btcli4j.control.commands.esplora.GetUtxOutCommand
 import io.vincenzopalazzo.btcli4j.model.bitcoin.UTXOBitcoin
 import io.vincenzopalazzo.btcli4j.util.JSONConverter
+import io.vincenzopalazzo.btcli4j.util.PluginManager
 import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
@@ -35,6 +36,11 @@ import jrpc.service.converters.jsonwrapper.CLightningJsonObject
  */
 class GetUtxOutBtc(private val bitcoinRPC: LiteBitcoinRPC, private val alternative: GetUtxOutCommand = GetUtxOutCommand()) : ICommand {
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
+        if (PluginManager.instance.isDownloading) {
+            plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Share message to esplora")
+            alternative.run(plugin, request, response)
+            return
+        }
         try {
             val txId = request["txid"].asString
             plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: TxId -> $txId")
@@ -64,14 +70,14 @@ class GetUtxOutBtc(private val bitcoinRPC: LiteBitcoinRPC, private val alternati
                 add("script", getUtxo.script.hex!!)
             }
         } catch (bitcoinEx: BitcoinCoreException) {
-            plugin.log(PluginLog.ERROR, "GetRawBlockByHeightBtc: terminate bitcoin core with error: %s".format(bitcoinEx.message))
+            plugin.log(PluginLog.ERROR, "GetUtxOutBtc: terminate bitcoin core with error: %s".format(bitcoinEx.message))
             response.apply {
                 add("amount", null)
                 add("script", null)
             }
         } catch (exception: LiteBitcoinRPCException) {
             plugin.log(PluginLog.ERROR, exception.stackTraceToString())
-            plugin.log(PluginLog.DEBUG, "GetRawBlockByHeightBtc: Share message to esplora")
+            plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Share message to esplora")
             alternative.run(plugin, request, response)
         }
         plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: answer is: " + JSONConverter.serialize(response))

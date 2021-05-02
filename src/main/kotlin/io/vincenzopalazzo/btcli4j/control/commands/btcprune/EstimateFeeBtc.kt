@@ -25,6 +25,7 @@ import io.github.clightning4j.litebtc.model.generic.Parameters
 import io.vincenzopalazzo.btcli4j.control.commands.ICommand
 import io.vincenzopalazzo.btcli4j.control.commands.esplora.EstimateFeeCommand
 import io.vincenzopalazzo.btcli4j.model.bitcoin.EstimateFeeBitcoin
+import io.vincenzopalazzo.btcli4j.util.PluginManager
 import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
@@ -37,11 +38,16 @@ class EstimateFeeBtc(
     private val alternative: EstimateFeeCommand = EstimateFeeCommand()
 ) : ICommand {
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
+        if (PluginManager.instance.isDownloading) {
+            plugin.log(PluginLog.DEBUG, "EstimateFeeBtc: Share message to esplora")
+            alternative.run(plugin, request, response)
+            return
+        }
         try {
             // TODO: try to use this transaction getmempoolinfo
             // read this issue https://github.com/ElementsProject/lightning/issues/4473#issue-853325816
             val params = Parameters("estimatesmartfee")
-            params.addParameter("conf_target", 6)
+            params.addParameter("conf_target", 2)
             // params.addParameter("estimate_mode", "CONSERVATIVE")
 
             val estimateFee = bitcoinRPC.makeBitcoinRequest(params, EstimateFeeBitcoin::class.java)

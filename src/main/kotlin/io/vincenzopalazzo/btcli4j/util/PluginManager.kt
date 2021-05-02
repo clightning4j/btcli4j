@@ -10,4 +10,5 @@ class PluginManager {
     var bitcoinPass = ""
     var bitcoinUser = ""
     var baseBitcoinUrl = ""
+    var isDownloading = false
 }

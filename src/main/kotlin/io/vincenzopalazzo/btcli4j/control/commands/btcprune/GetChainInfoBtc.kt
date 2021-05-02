@@ -24,6 +24,7 @@ import io.github.clightning4j.litebtc.exceptions.LiteBitcoinRPCException
 import io.vincenzopalazzo.btcli4j.control.commands.ICommand
 import io.vincenzopalazzo.btcli4j.control.commands.esplora.GetChainInfoCommand
 import io.vincenzopalazzo.btcli4j.model.bitcoin.BlockchainInfoBitcoin
+import io.vincenzopalazzo.btcli4j.util.PluginManager
 import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.exceptions.CLightningPluginException
 import jrpc.clightning.plugins.log.PluginLog
@@ -48,6 +49,9 @@ class GetChainInfoBtc(
             }
 
             if (blockchainInfo.isDownloading!!) {
+                PluginManager.instance.isDownloading = blockchainInfo.isDownloading!!
+                val checkBtcStatusTask = CheckStatusBitcoinCore(bitcoinRPC, plugin)
+                checkBtcStatusTask.run()
                 plugin.log(PluginLog.DEBUG, "GetChainInfoBtc: Share message to esplora")
                 alternative.run(plugin, request, response)
                 return
@@ -82,5 +86,16 @@ class GetChainInfoBtc(
             "regtest" -> return "regtest"
         }
         throw CLightningPluginException(400, "Unknown name chain %s under Bitcoin Core".format(chainName))
+    }
+}
+
+class CheckStatusBitcoinCore(private val bitcoinRPC: LiteBitcoinRPC, private val plugin: CLightningPlugin, private val timeout: Long = 60000) : Runnable {
+    override fun run() {
+        while (PluginManager.instance.isDownloading) {
+            val info = bitcoinRPC.makeBitcoinRequest("", BlockchainInfoBitcoin::class.java)
+            plugin.log(PluginLog.DEBUG, "Status bitcoin core: %s".format(info.isDownloading))
+            PluginManager.instance.isDownloading = info.isDownloading!!
+            Thread.sleep(timeout)
+        }
     }
 }

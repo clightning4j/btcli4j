@@ -1,6 +1,8 @@
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.4.30"
     id("org.jmailen.kotlinter") version "3.3.0"
+    //TODO: https://github.com/mike-neck/graalvm-native-image-plugin
+    //id("org.mikeneck.graalvm-native-image") version "1.3.0"
     application
     maven
 }
