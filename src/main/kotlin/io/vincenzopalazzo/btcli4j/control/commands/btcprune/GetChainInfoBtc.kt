@@ -30,6 +30,7 @@ import jrpc.clightning.plugins.exceptions.CLightningPluginException
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
 import java.lang.Exception
+import kotlin.concurrent.thread
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -50,8 +51,9 @@ class GetChainInfoBtc(
 
             if (blockchainInfo.isDownloading!!) {
                 PluginManager.instance.isDownloading = blockchainInfo.isDownloading!!
-                val checkBtcStatusTask = CheckStatusBitcoinCore(bitcoinRPC, plugin)
-                checkBtcStatusTask.run()
+                thread(isDaemon = true, start = true) {
+                    checkBitcoinStatus(bitcoinRPC, plugin)
+                }
                 plugin.log(PluginLog.DEBUG, "GetChainInfoBtc: Share message to esplora")
                 alternative.run(plugin, request, response)
                 return
@@ -87,10 +89,8 @@ class GetChainInfoBtc(
         }
         throw CLightningPluginException(400, "Unknown name chain %s under Bitcoin Core".format(chainName))
     }
-}
 
-class CheckStatusBitcoinCore(private val bitcoinRPC: LiteBitcoinRPC, private val plugin: CLightningPlugin, private val timeout: Long = 60000) : Runnable {
-    override fun run() {
+    private fun checkBitcoinStatus(bitcoinRPC: LiteBitcoinRPC, plugin: CLightningPlugin, timeout: Long = 60000) {
         while (PluginManager.instance.isDownloading) {
             try {
                 val info = bitcoinRPC.makeBitcoinRequest("getblockchaininfo", BlockchainInfoBitcoin::class.java)
@@ -114,3 +114,4 @@ class CheckStatusBitcoinCore(private val bitcoinRPC: LiteBitcoinRPC, private val
         }
     }
 }
+
