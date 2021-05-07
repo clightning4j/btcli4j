@@ -51,12 +51,12 @@ class EstimateFeeCommand : ICommand {
             if (!estimateFee.isEmpty()) {
                 response.apply {
                     add("opening", estimateFee.estimateFeeForNormalTarget().toInt())
-                    add("mutual_close", estimateFee.estimateFeeForSlowTarget().toInt())
+                    add("mutual_close", estimateFee.estimateFeeRate().toInt())
                     add("unilateral_close", estimateFee.estimateFeeForUrgentTarget().toInt())
-                    add("delayed_to_us", estimateFee.estimateFeeForSlowTarget().toInt())
+                    add("delayed_to_us", estimateFee.estimateFeeRate().toInt())
                     add("htlc_resolution", estimateFee.estimateFeeForNormalTarget().toInt())
                     add("penalty", estimateFee.getAverageEstimateFee().toInt())
-                    add("min_acceptable", estimateFee.estimateFeeForSlowTarget().toInt() / 2)
+                    add("min_acceptable", estimateFee.estimateFeeRate().toInt() / 2)
                     add("max_acceptable", estimateFee.estimateFeeForVeryUrgentTarget().toInt() * 10)
                 }
             } else if (estimateFee.isEmpty()) {

@@ -50,11 +50,18 @@ class GetUtxOutBtc(private val bitcoinRPC: LiteBitcoinRPC, private val alternati
             params.addParameter("txid", txId)
             params.addParameter("n", vOut)
             // params.addParameter("include_mempool", true) TODO: double check
-            val getUtxo = bitcoinRPC.makeBitcoinRequest(params, UTXOBitcoin::class.java)
-            plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Bitcoin getutxo response is %s".format(JSONConverter.serialize(getUtxo)))
+            val getUtxo: UTXOBitcoin? = bitcoinRPC.makeBitcoinRequest(params, UTXOBitcoin::class.java)
+            plugin.log(
+                PluginLog.DEBUG,
+                "GetUtxOutBtc: Bitcoin getutxo response is %s".format(
+                    JSONConverter.serialize(
+                        getUtxo ?: "Is null"
+                    )
+                )
+            )
             // TODO: bitcoin core should return an error?
-            if (getUtxo.amount == null || getUtxo.script == null || getUtxo.script.hex == null || getUtxo.script.hex!!.isEmpty()) {
-                plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Received undefined response, return a null reponse")
+            if (getUtxo?.amount == null || getUtxo.script == null || getUtxo.script.hex == null || getUtxo.script.hex!!.isEmpty()) {
+                plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Received undefined response, return a null response")
                 response.apply {
                     add("amount", null)
                     add("script", null)

@@ -41,15 +41,21 @@ class EstimateFeeModel {
         return mapEstimationFee.isEmpty()
     }
 
-    fun estimateFeeForSlowTarget(): Double {
-        var bigKey = 0
+    /**
+     * This method calculate the take the latest feerate return from the API in the latest block
+     * with the esplora api the minimum blocks are 6, if this value is not present
+     * it is calculate the minimum number of blocks in the JSON response.
+     */
+    fun estimateFeeRate(): Double {
+        var minKey = 0
         var result = 0.0
-        if (mapEstimationFee.containsKey(144)) {
-            return mapEstimationFee[144]!!
+        if (mapEstimationFee.containsKey(6)) {
+            return mapEstimationFee[6]!!
         }
+
         mapEstimationFee.forEach {
-            if (bigKey < it.key) {
-                bigKey = it.key
+            if (minKey > it.key) {
+                minKey = it.key
                 result = it.value
             }
         }
@@ -64,7 +70,7 @@ class EstimateFeeModel {
         } else if (containsKey(4)) {
             return getValue(5)
         }
-        return estimateFeeForSlowTarget()
+        return estimateFeeRate()
     }
 
     fun estimateFeeForUrgentTarget(): Double {
