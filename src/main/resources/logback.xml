@@ -52,4 +52,8 @@
     <appender-ref ref="FILE" />
     <!--  <appender-ref ref="STDOUT" /> -->
   </logger>
+
+  <logger name="io.github.clightning4j.litebtc" level="OFF">
+    <appender-ref ref="FILE" />
+  </logger>
 </configuration>
