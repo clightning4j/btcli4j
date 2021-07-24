@@ -16,6 +16,8 @@
  */
 -->
 <configuration debug="false" scan="true">
+  <!-- Disable logback information -->
+  <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -38,22 +40,13 @@
     </encoder>
   </appender>
 
-  <root level="OFF">
-    <!-- <appender-ref ref="STDOUT" /> -->
+  <root level="WARN">
+    <appender-ref ref="STDOUT" />
     <appender-ref ref="FILE" />
   </root>
 
-  <logger name="j.service.socket.UnixDomainSocketRpc" level="OFF">
-    <!-- <appender-ref ref="STDOUT" /> -->
-    <appender-ref ref="FILE" />
-  </logger>
-
-  <logger name="jrpc.clightning.plugins" level="OFF">
-    <appender-ref ref="FILE" />
-    <!--  <appender-ref ref="STDOUT" /> -->
-  </logger>
-
-  <logger name="io.github.clightning4j.litebtc" level="OFF">
-    <appender-ref ref="FILE" />
-  </logger>
+  <logger name="j.service.socket.UnixDomainSocketRpc" level="OFF"/>
+  <logger name="jrpc.clightning.plugins" level="OFF"/>
+  <logger name="jrpc.clightning" level="OFF"/>
+  <logger name="io.github.clightning4j.litebtc" level="OFF"/>
 </configuration>
