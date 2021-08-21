@@ -4,12 +4,19 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { JDK: 1.8 }
+          - { JDK: 11 }
+          - { JDK: 14 }
     steps:
       - uses: actions/checkout@v1
-      - name: Set up JDK 1.8
+      - name: Set up JDK ${{ matrix.JDK }}
         uses: actions/setup-java@v1
         with:
-          java-version: 1.8
+          java-version: ${{ matrix.JDK }}
       - name: Check Kotling format
         run: |
           ./gradlew lintKotlin
