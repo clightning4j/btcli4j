@@ -103,7 +103,7 @@ class Plugin : CLightningPlugin() {
 
     @RPCMethod(name = "getchaininfo", description = "getchaininfo to fetch the data from blockstream.info")
     fun getChainInfo(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
-        this.configurePluginInit(plugin)
+        this.configurePluginInit()
         MediationMethod.runCommand("getchaininfo", plugin, CLightningJsonObject(request["params"].asJsonObject), response)
     }
 
@@ -127,24 +127,23 @@ class Plugin : CLightningPlugin() {
         MediationMethod.runCommand("sendrawtransaction", plugin, CLightningJsonObject(request["params"].asJsonObject), response)
     }
 
-    private fun configurePluginInit(plugin: CLightningPlugin) {
+    private fun configurePluginInit() {
         // TODO: The plugin have some proxy enabled and proxy url propriety to give the possibility to the user
         // to specify a custom proxy only of the http client used by the plugin. Implement this view.
         val optionsManager = OptionsManager(endpointUrl, waitingTime, null, proxyEnable, proxy)
-        if (!pluginInit && plugin.configs.isProxyEnabled) {
-            pluginInit = true
-            val proxyIp = plugin.configs.proxy.address
-            val proxyPort = plugin.configs.proxy.port
-            val torVersion = when(plugin.configs.proxy.type) {
+        if (!pluginInit && configs.isProxyEnabled) {
+            val proxyIp = configs.proxy.address
+            val proxyPort = configs.proxy.port
+            val torVersion = when(configs.proxy.type) {
                 "torv3" -> 3
                 "torv2" -> 2
-                else -> null
+                else -> if (configs.isTorv3) 3 else null
             }
-            this.proxyEnable = proxyIp.isNotEmpty()
-            optionsManager.proxyEnabled = proxyEnable
+            optionsManager.proxyEnabled = configs.isProxyEnabled
             optionsManager.proxyUrl = "%s:%d".format(proxyIp, proxyPort)
             optionsManager.torVersion = torVersion
             log(PluginLog.INFO, "btcli4j: proxy enable at ${optionsManager.proxyUrl}")
+            log(PluginLog.INFO, "btcli4j: proxy type is ${configs.proxy.type}")
         }
 
         if (prunedMode && bitcoinRpcPass.trim().isNotEmpty() && bitcoinRpcUser.trim().isNotEmpty()) {
@@ -154,5 +153,6 @@ class Plugin : CLightningPlugin() {
             PluginManager.instance.prunedMode = true
         }
         HttpRequestFactory.initHttpClient(optionsManager)
+        pluginInit = true
     }
 }
