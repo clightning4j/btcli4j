@@ -55,9 +55,12 @@ with `plugin=/PATH/bash/file` or use the command line `--plugin=/path/bash/file`
 
 ## Plugin parameter
 
+- btcli4j-endpoint: A string option that is the end point url,by default it is the [esplora](https://github.com/Blockstream/esplora/blob/master/API.md) end point, 
+- it is the end point it is different the proxy with tor is lost from the automatic configuration of the plugin
+- btcli4j-waiting: A integer that is the base waiting time where the plugin will apply the increase waiting time in case of error with the end point.
 - btcli4j-proxy: Indicate the proxy address, by default is: "127.0.0.1:9050".
-- btcli4j-proxy-enable: A flag option, it help the user to enable the tor socket, by default it is used the same configuration of c-lightning.
-- btcli4j-pruned: A flag option that tell to plugin to ran in pruning mode
+- btcli4j-proxy-enable: A flag option, it helps the user to enable the tor socket, by default it is used the same configuration of c-lightning.
+- btcli4j-pruned: A flag option that tell to the plugin to ran in pruning mode
 - bitcoin-rpcurl: A string option that is the url of Bitcoin RPC interface, usually `http://127.0.0.1:8332` for mainet and `http://127.0.0.1:18332` for testnet
 - bitcoin-rpcuser: A string option that is the user to make the login in Bitcoin core
 - bitcoin-rpcpassword: A string option that is the password to make the login in Bitcoin core

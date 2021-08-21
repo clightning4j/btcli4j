@@ -37,14 +37,10 @@ import okio.ByteString
  */
 object HttpRequestFactory {
 
-    private const val BASE_URL = "https://blockstream.info"
-    private const val BASE_URL_TORV3 = "http://explorerzydxu5ecjrkwceayqybizmpjjznk5izmitf2modhcusuqlid.onion"
-    private const val BASE_URL_TORV2 = "http://explorernuoc63nb.onion"
-    private const val WAIT_TIME: Long = 60000 // TODO: Make this propriety available in the console
-
-    private var proxyEnabled: Boolean = false
+    private lateinit var optionsManager: OptionsManager
     private var retryTime = 4
     private var checkChains = ChainOfResponsibilityCheck()
+    private lateinit var baseUrl: String
     private var client = OkHttpClient.Builder()
         .retryOnConnectionFailure(true)
         .connectTimeout(1, TimeUnit.MINUTES)
@@ -52,7 +48,15 @@ object HttpRequestFactory {
         .readTimeout(1, TimeUnit.MINUTES)
         .build()
 
-    fun configureProxy(proxyString: String, tor: Boolean = true) {
+    fun initHttpClient(optionsManager: OptionsManager) {
+        this.optionsManager = optionsManager
+        if (optionsManager.proxyEnabled) {
+            this.configureProxy(optionsManager.proxyUrl, optionsManager.torVersion != null)
+        }
+        baseUrl = optionsManager.getEndPointUrl()
+    }
+
+    private fun configureProxy(proxyString: String, tor: Boolean = true) {
         val tokens = proxyString.split(":")
         val ip = tokens[0]
         val port = tokens[1]
@@ -66,7 +70,6 @@ object HttpRequestFactory {
                 .writeTimeout(2, TimeUnit.MINUTES)
                 .readTimeout(2, TimeUnit.MINUTES)
                 .build()
-            proxyEnabled = true
         }
     }
 
@@ -81,14 +84,8 @@ object HttpRequestFactory {
         url: String,
         type: String = "get",
         body: String = "",
-        mediaType: MediaType = "application/json; charset=utf-8".toMediaType(),
-        torVersion: Int = 3
+        mediaType: MediaType = "application/json; charset=utf-8".toMediaType()
     ): Request? {
-        val baseUrl: String
-        when (proxyEnabled) {
-            true -> baseUrl = if (torVersion == 3) BASE_URL_TORV3 else BASE_URL_TORV2
-            false -> baseUrl = BASE_URL
-        }
         val completeUrl = "%s/%s".format(baseUrl, url)
         when (type) {
             "get" -> return buildGetRequest(completeUrl)
@@ -136,12 +133,12 @@ object HttpRequestFactory {
     }
 
     private fun waitingToRetry(plugin: CLightningPlugin, retryTime: Int) {
-        val exponentialRetryTime = WAIT_TIME * (retryTime + 1)
+        val exponentialRetryTime = optionsManager.waitingTime * (retryTime + 1)
         plugin.log(
             PluginLog.WARNING,
             "Error occurs %d time: and the waiting time is set to %d".format(retryTime, exponentialRetryTime)
         )
-        Thread.sleep(exponentialRetryTime)
+        Thread.sleep(exponentialRetryTime.toLong())
     }
 
     private fun makeRequest(request: Request): Response {

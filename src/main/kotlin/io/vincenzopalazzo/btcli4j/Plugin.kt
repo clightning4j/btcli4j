@@ -20,6 +20,7 @@ package io.vincenzopalazzo.btcli4j
 
 import io.vincenzopalazzo.btcli4j.control.MediationMethod
 import io.vincenzopalazzo.btcli4j.util.HttpRequestFactory
+import io.vincenzopalazzo.btcli4j.util.OptionsManager
 import io.vincenzopalazzo.btcli4j.util.PluginManager
 import jrpc.clightning.annotation.PluginOption
 import jrpc.clightning.annotation.RPCMethod
@@ -31,6 +32,24 @@ import jrpc.service.converters.jsonwrapper.CLightningJsonObject
  * @author https://github.com/vincenzopalazzo
  */
 class Plugin : CLightningPlugin() {
+
+    @PluginOption(
+        name = "btcli4j-endpoint",
+        description = "This option give information on rest end point url, by default it is the esplora url. " +
+            "If you specify this URL you are losing the autoconfiguration of the tor proxy in case of proxy enabled with lightningd.",
+        defValue = "https://blockstream.info",
+        typeValue = "string"
+    )
+    private var endpointUrl: String = "https://blockstream.info"
+
+    @PluginOption(
+        name = "btcli4j-waiting",
+        description = "This option give information on the waiting time in case of error with the endpoint connection. " +
+            "In case of failure this value is the base value where the plugin start to use the increase waiting time rules.",
+        defValue = "60000",
+        typeValue = "int"
+    )
+    private var waitingTime: Int = 60000
 
     @PluginOption(
         name = "btcli4j-proxy",
@@ -47,14 +66,6 @@ class Plugin : CLightningPlugin() {
         typeValue = "flag"
     )
     private var proxyEnable: Boolean = true
-
-    @PluginOption(
-        name = "btcli4j-endpoint",
-        description = "If btcli4j-endpoint is specified the blockstream endpoint will be override with the custom endpoint",
-        defValue = "",
-        typeValue = "string"
-    )
-    private var personalEndPoint: String = ""
 
     @PluginOption(
         name = "bitcoin-rpcpassword",
@@ -116,19 +127,24 @@ class Plugin : CLightningPlugin() {
         MediationMethod.runCommand("sendrawtransaction", plugin, CLightningJsonObject(request["params"].asJsonObject), response)
     }
 
-    // TODO configure the personal endpoint propriety!!
     private fun configurePluginInit(plugin: CLightningPlugin) {
+        // TODO: The plugin have some proxy enabled and proxy url propriety to give the possibility to the user
+        // to specify a custom proxy only of the http client used by the plugin. Implement this view.
+        val optionsManager = OptionsManager(endpointUrl, waitingTime, null, proxyEnable, proxy)
         if (!pluginInit && plugin.configs.isProxyEnabled) {
             pluginInit = true
             val proxyIp = plugin.configs.proxy.address
             val proxyPort = plugin.configs.proxy.port
-            this.proxyEnable = proxyIp.isNotEmpty()
-            this.proxy = "%s:%d".format(proxyIp, proxyPort)
-            log(PluginLog.WARNING, "proxy enable: $proxyEnable")
-            if (proxyEnable) {
-                HttpRequestFactory.configureProxy(this.proxy, true)
-                log(PluginLog.INFO, "Tor proxy enabled on btcli4j")
+            val torVersion = when(plugin.configs.proxy.type) {
+                "torv3" -> 3
+                "torv2" -> 2
+                else -> null
             }
+            this.proxyEnable = proxyIp.isNotEmpty()
+            optionsManager.proxyEnabled = proxyEnable
+            optionsManager.proxyUrl = "%s:%d".format(proxyIp, proxyPort)
+            optionsManager.torVersion = torVersion
+            log(PluginLog.INFO, "btcli4j: proxy enable at ${optionsManager.proxyUrl}")
         }
 
         if (prunedMode && bitcoinRpcPass.trim().isNotEmpty() && bitcoinRpcUser.trim().isNotEmpty()) {
@@ -137,5 +153,6 @@ class Plugin : CLightningPlugin() {
             PluginManager.instance.baseBitcoinUrl = bitcoinBaseUrl
             PluginManager.instance.prunedMode = true
         }
+        HttpRequestFactory.initHttpClient(optionsManager)
     }
 }
