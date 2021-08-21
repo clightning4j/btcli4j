@@ -8,38 +8,23 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { JDK: 1.8 }
+          - { JDK: 11 }
+          - { JDK: 14 }
     steps:
       - uses: actions/checkout@v1
-      - name: Set up JDK 1.8 and upload jar
+      - name: Set up JDK ${{ matrix.JDK }} and upload jar
         uses: actions/setup-java@v1
         with:
-          java-version: 1.8
+          java-version: ${{ matrix.JDK }}
       - name: Build with Gradle
         run: |
           ./gradlew createRunnableScript
       - uses: actions/upload-artifact@v2
         with:
-          name: btcli4j-all-JDK8
-          path: build/libs/btcli4j-all.jar
-      - name: Set up JDK 11 and upload jar
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-      - name: Build with Gradle
-        run: |
-          ./gradlew createRunnableScript
-      - uses: actions/upload-artifact@v2
-        with:
-          name: btcli4j-all-JDK11
-          path: build/libs/btcli4j-all.jar
-      - name: Set up JDK 14 and upload jar
-        uses: actions/setup-java@v1
-        with:
-          java-version: 14
-      - name: Build with Gradle
-        run: |
-          ./gradlew createRunnableScript
-      - uses: actions/upload-artifact@v2
-        with:
-          name: btcli4j-all-JDK14
+          name: btcli4j-all-${{ matrix.JDK }}
           path: build/libs/btcli4j-all.jar
