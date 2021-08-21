@@ -134,7 +134,7 @@ class Plugin : CLightningPlugin() {
         if (!pluginInit && configs.isProxyEnabled) {
             val proxyIp = configs.proxy.address
             val proxyPort = configs.proxy.port
-            val torVersion = when(configs.proxy.type) {
+            val torVersion = when (configs.proxy.type) {
                 "torv3" -> 3
                 "torv2" -> 2
                 else -> if (configs.isTorv3) 3 else null
