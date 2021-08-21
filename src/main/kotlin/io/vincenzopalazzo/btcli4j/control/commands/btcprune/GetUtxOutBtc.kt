@@ -72,7 +72,7 @@ class GetUtxOutBtc(private val bitcoinRPC: LiteBitcoinRPC, private val alternati
             // Check if the data are valid, otherwise put the message to esplora
             plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: answer from gettxout: " + JSONConverter.serialize(getUtxo))
             plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Amount tx (not conv to integer): " + getUtxo.amount!!)
-            plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Script hex: %s".format(getUtxo.script!!.hex!!))
+            plugin.log(PluginLog.DEBUG, "GetUtxOutBtc: Script hex: %s".format(getUtxo.script.hex!!))
             response.apply {
                 add("amount", getUtxo.amount!!.toInt())
                 add("script", getUtxo.script.hex!!)

@@ -9,12 +9,12 @@ class OptionsManager(private val url: String, val waitingTime: Int, var torVersi
     }
 
     private fun customEndPoint(): Boolean {
-        when (url) {
-            BASE_URL -> return true
-            BASE_URL_TORV2 -> return true
-            BASE_URL_TORV3 -> return true
+        return when (url) {
+            BASE_URL -> false
+            BASE_URL_TORV2 -> false
+            BASE_URL_TORV3 -> false
+            else -> true
         }
-        return false
     }
 
     fun getEndPointUrl(): String {

@@ -144,6 +144,7 @@ class Plugin : CLightningPlugin() {
             optionsManager.torVersion = torVersion
             log(PluginLog.INFO, "btcli4j: proxy enable at ${optionsManager.proxyUrl}")
             log(PluginLog.INFO, "btcli4j: proxy type is ${configs.proxy.type}")
+            log(PluginLog.INFO, "btcli4j: tor version is $torVersion")
         }
 
         if (prunedMode && bitcoinRpcPass.trim().isNotEmpty() && bitcoinRpcUser.trim().isNotEmpty()) {
