@@ -26,7 +26,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
-    implementation("io.github.clightning4j:jrpclightning:0.2.1-SNAPSHOT")
+    implementation("io.github.clightning4j:jrpclightning:0.2.2")
     implementation("io.github.clightning4j:lite-bitcoin-rpc:0.0.1-rc2-SNAPSHOT")
 
     //Developing library
@@ -63,8 +63,9 @@ tasks {
         file("$projectDir/${project.name}-gen.sh").createNewFile()
         file("$projectDir/${project.name}-gen.sh").writeText(
             """
-                # Script generated from gradle! By clightning4j
                 #!/bin/bash
+                # Script generated from gradle! By clightning4j
+
                 ${System.getProperties().getProperty("java.home")}/bin/java -jar ${project.buildDir.absolutePath}/libs/${project.name}-all.jar
             """.trimIndent()
         )
