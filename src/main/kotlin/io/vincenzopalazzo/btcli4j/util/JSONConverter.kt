@@ -19,6 +19,7 @@
 package io.vincenzopalazzo.btcli4j.util
 
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonPrimitive
 import io.vincenzopalazzo.btcli4j.model.esplora.EstimateFeeModel
 import io.vincenzopalazzo.btcli4j.util.typeadapter.EstimateFeeTypeAdapter
 import java.lang.reflect.Type
@@ -48,5 +49,10 @@ object JSONConverter {
             ex.printStackTrace()
             throw RuntimeException(ex.cause)
         }
+    }
+
+    fun isJSONNull(fromString: String): Boolean {
+        val type = gson.fromJson(fromString, JsonPrimitive::class.java)
+        return type.isJsonNull
     }
 }
