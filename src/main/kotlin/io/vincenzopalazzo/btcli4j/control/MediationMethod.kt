@@ -34,6 +34,18 @@ import io.vincenzopalazzo.btcli4j.control.commands.btcprune.GetUtxOutBtc
 import io.vincenzopalazzo.btcli4j.control.commands.btcprune.SendRawTransactionBtc
 import io.vincenzopalazzo.btcli4j.util.PluginManager
 
+public enum class Command(private val commandName: String) {
+    GetChainInfoBtc("getchaininfo"),
+    EstimateFeeBtc("estimatefees"),
+    GetRawBlockByHeightBtc("getrawblockbyheight"),
+    GetUtxOutBtc("getutxout"),
+    SendRawTransactionBtc("sendrawtransaction");
+
+    override fun toString(): String {
+        return commandName
+    }
+}
+
 /**
  * @author https://github.com/vincenzopalazzo
  */
@@ -42,7 +54,7 @@ object MediationMethod {
     private val commands: HashMap<String, ICommand> = HashMap()
 
     init {
-        // The prune mode need to be overrided with a enum
+        // The prune mode need to be overridden with a enum
         // because it is possible use the bitcoin RPC interface
         // to talk with the bitcoin node and also with all the othe rimplementation
         // that use the Bitcoin RPC 1.0 interface (e.g Litecoin)
@@ -55,19 +67,19 @@ object MediationMethod {
             )
 
             commands.apply {
-                put("getchaininfo", GetChainInfoBtc(bitcoinRPC))
-                put("estimatefees", EstimateFeeBtc(bitcoinRPC))
-                put("getrawblockbyheight", GetRawBlockByHeightBtc(bitcoinRPC))
-                put("getutxout", GetUtxOutBtc(bitcoinRPC))
-                put("sendrawtransaction", SendRawTransactionBtc(bitcoinRPC))
+                put(Command.GetChainInfoBtc.toString(), GetChainInfoBtc(bitcoinRPC))
+                put(Command.EstimateFeeBtc.toString(), EstimateFeeBtc(bitcoinRPC))
+                put(Command.GetRawBlockByHeightBtc.toString(), GetRawBlockByHeightBtc(bitcoinRPC))
+                put(Command.GetUtxOutBtc.toString(), GetUtxOutBtc(bitcoinRPC))
+                put(Command.SendRawTransactionBtc.toString(), SendRawTransactionBtc(bitcoinRPC))
             }
         } else {
             commands.apply {
-                put("getchaininfo", GetChainInfoCommand())
-                put("estimatefees", EstimateFeeCommand())
-                put("getrawblockbyheight", GetRawBlockByHeightCommand())
-                put("getutxout", GetUtxOutCommand())
-                put("sendrawtransaction", SendRawTransactionCommand())
+                put(Command.GetChainInfoBtc.toString(), GetChainInfoCommand())
+                put(Command.EstimateFeeBtc.toString(), EstimateFeeCommand())
+                put(Command.GetRawBlockByHeightBtc.toString(), GetRawBlockByHeightCommand())
+                put(Command.GetUtxOutBtc.toString(), GetUtxOutCommand())
+                put(Command.SendRawTransactionBtc.toString(), SendRawTransactionCommand())
             }
         }
     }

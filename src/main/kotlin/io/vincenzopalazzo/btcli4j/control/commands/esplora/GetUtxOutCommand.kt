@@ -18,6 +18,8 @@
  */
 package io.vincenzopalazzo.btcli4j.control.commands.esplora
 
+import io.vincenzopalazzo.btcli4j.control.Command
+import io.vincenzopalazzo.btcli4j.control.checkchain.ChainOfResponsibilityCheck
 import io.vincenzopalazzo.btcli4j.control.commands.ICommand
 import io.vincenzopalazzo.btcli4j.model.esplora.BTCTransactionModel
 import io.vincenzopalazzo.btcli4j.model.esplora.StatusUTXOModel
@@ -27,11 +29,12 @@ import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.exceptions.CLightningPluginException
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
+import java.lang.reflect.InvocationTargetException
 
 /**
  * @author https://github.com/vincenzopalazzo
  */
-class GetUtxOutCommand : ICommand {
+class GetUtxOutCommand(private val sanityCheck: ChainOfResponsibilityCheck = ChainOfResponsibilityCheck()) : ICommand {
 
     override fun run(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
         val queryUrl = HttpRequestFactory.buildQueryRL(plugin.configs.network)
@@ -43,10 +46,13 @@ class GetUtxOutCommand : ICommand {
             if (getUTXOInformation(plugin, txId, vOut, response)) {
                 // The transaction wasn't spent!!
                 val reqTxInformation = HttpRequestFactory.createRequest("%s/tx/%s".format(queryUrl, txId))!!
-                val resTxInformation = HttpRequestFactory.execRequest(plugin, reqTxInformation).utf8()
-                if (resTxInformation.isNotEmpty() /*&& resTxInformation !== "{}" */) {
+                val resTxInformation = HttpRequestFactory.execRequest(plugin, reqTxInformation)
+                // the API can return an impartial answer, and this required a monkey sanity check!
+                val checkResult = sanityCheck.checkCommand(Command.GetUtxOutBtc, plugin, resTxInformation)
+                if (checkResult.isSafe()) {
+                    val cleanResponse = checkResult.result!!.utf8()
                     val transactionInformation = JSONConverter.deserialize<BTCTransactionModel>(
-                        resTxInformation,
+                        cleanResponse,
                         BTCTransactionModel::class.java
                     )
                     val transactionOutput = transactionInformation.transactionsOutput?.get(vOut)!!
@@ -61,8 +67,16 @@ class GetUtxOutCommand : ICommand {
                     add("script", null)
                 }
             }
+        } catch (invocation: InvocationTargetException) {
+            // Caused by: https://github.com/clightning4j/btcli4j/pull/60#issuecomment-1174881779
+            // Source: https://stackoverflow.com/a/6020758/10854225
+            val ex = invocation.cause!!
+            plugin.log(PluginLog.WARNING, ex.localizedMessage)
+            ex.printStackTrace()
+            throw CLightningPluginException(400, ex.localizedMessage)
         } catch (ex: Exception) {
             plugin.log(PluginLog.WARNING, ex.localizedMessage)
+            ex.printStackTrace()
             throw CLightningPluginException(400, ex.localizedMessage)
         }
     }

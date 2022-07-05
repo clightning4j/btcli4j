@@ -1,0 +1,16 @@
+{
+  "package_name": "btcli4j",
+  "version": "v0.0.3",
+  "api": {
+    "name": "github",
+    "repository": "clightning4j/btcli4j",
+    "branch": "master"
+  },
+  "generation_method": {
+    "name": "metadata",
+    "header_filter": false
+  },
+  "serialization_method": {
+    "name": "md"
+  }
+}
