@@ -29,6 +29,7 @@ import jrpc.clightning.plugins.CLightningPlugin
 import jrpc.clightning.plugins.exceptions.CLightningPluginException
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
+import java.lang.reflect.InvocationTargetException
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -66,8 +67,16 @@ class GetUtxOutCommand(private val sanityCheck: ChainOfResponsibilityCheck = Cha
                     add("script", null)
                 }
             }
+        } catch (invocation: InvocationTargetException) {
+            // Caused by: https://github.com/clightning4j/btcli4j/pull/60#issuecomment-1174881779
+            // Source: https://stackoverflow.com/a/6020758/10854225
+            val ex = invocation.cause!!
+            plugin.log(PluginLog.WARNING, ex.localizedMessage)
+            ex.printStackTrace()
+            throw CLightningPluginException(400, ex.localizedMessage)
         } catch (ex: Exception) {
             plugin.log(PluginLog.WARNING, ex.localizedMessage)
+            ex.printStackTrace()
             throw CLightningPluginException(400, ex.localizedMessage)
         }
     }
