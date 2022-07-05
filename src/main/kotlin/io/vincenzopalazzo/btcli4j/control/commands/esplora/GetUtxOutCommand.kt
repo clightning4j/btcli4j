@@ -49,8 +49,8 @@ class GetUtxOutCommand(private val sanityCheck: ChainOfResponsibilityCheck = Cha
                 val resTxInformation = HttpRequestFactory.execRequest(plugin, reqTxInformation)
                 // the API can return an impartial answer, and this required a monkey sanity check!
                 val checkResult = sanityCheck.checkCommand(Command.GetUtxOutBtc, plugin, resTxInformation)
-                if (checkResult.result != null) {
-                    val cleanResponse = checkResult.result.utf8()
+                if (checkResult.isSafe()) {
+                    val cleanResponse = checkResult.result!!.utf8()
                     val transactionInformation = JSONConverter.deserialize<BTCTransactionModel>(
                         cleanResponse,
                         BTCTransactionModel::class.java

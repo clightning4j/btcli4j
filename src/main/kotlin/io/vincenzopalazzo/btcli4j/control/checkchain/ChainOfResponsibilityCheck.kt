@@ -51,13 +51,13 @@ class ChainOfResponsibilityCheck {
 
     fun checkCommand(forCommand: Command, plugin: CLightningPlugin, response: ByteString): CheckResult {
         if (commandsCheck.containsKey(forCommand.toString())) {
-            val handler = commandsCheck[commandsCheck.toString()]!!
+            val handler = commandsCheck[forCommand.toString()]!!
             handler.forEach {
                 val result = it.check(plugin, response)
                 if (!result.next)
                     return result
             }
-            return CheckResult(false, ByteString.of("Check fails".toByte()))
+            return CheckResult(false, response)
         }
         throw IllegalArgumentException("No sanity check for command $forCommand")
     }

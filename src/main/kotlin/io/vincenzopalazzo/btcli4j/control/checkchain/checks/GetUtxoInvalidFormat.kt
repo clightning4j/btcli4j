@@ -19,12 +19,12 @@ class GetUtxoInvalidFormat : CheckHandler {
                     response.utf8(),
                     BTCTransactionModel::class.java
                 )
-                return CheckResult(next = false, response)
+                return CheckResult(next = true, response)
             }
         } catch (jsonException: JsonSyntaxException) {
             plugin.log(PluginLog.ERROR, "We receive a 200 code from the server, but the reponse looks invalid")
             plugin.log(PluginLog.ERROR, jsonException.message)
         }
-        return CheckResult(next = true)
+        return CheckResult(next = false)
     }
 }
