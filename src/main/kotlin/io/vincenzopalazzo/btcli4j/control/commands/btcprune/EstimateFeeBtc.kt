@@ -47,7 +47,7 @@ class EstimateFeeBtc(
             // TODO: try to use this transaction getmempoolinfo
             // read this issue https://github.com/ElementsProject/lightning/issues/4473#issue-853325816
             val params = Parameters("estimatesmartfee")
-            params.addParameter("conf_target", 2)
+            params.addParameter("conf_target", 6)
             // params.addParameter("estimate_mode", "CONSERVATIVE")
 
             val estimateFee = bitcoinRPC.makeBitcoinRequest(params, EstimateFeeBitcoin::class.java)
