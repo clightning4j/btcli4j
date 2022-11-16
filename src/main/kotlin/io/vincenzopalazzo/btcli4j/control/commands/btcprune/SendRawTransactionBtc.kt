@@ -61,6 +61,7 @@ class SendRawTransactionBtc(private val bitcoinRPC: LiteBitcoinRPC, private val 
                 is BitcoinCoreException -> {
                     plugin.log(PluginLog.ERROR, "GetChainInfoBtc: terminate bitcoin core with error: %s".format(exception.message))
                     response.apply {
+                        add("success", false)
                         add("errmsg", exception.message)
                     }
                 }
