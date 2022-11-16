@@ -60,13 +60,16 @@ class SendRawTransactionBtc(private val bitcoinRPC: LiteBitcoinRPC, private val 
             when (exception) {
                 is BitcoinCoreException -> {
                     plugin.log(PluginLog.ERROR, "GetChainInfoBtc: terminate bitcoin core with error: %s".format(exception.message))
+                    response.apply {
+                        add("errmsg", exception.message)
+                    }
                 }
                 is LiteBitcoinRPCException -> {
                     plugin.log(PluginLog.ERROR, exception.stackTraceToString())
+                    plugin.log(PluginLog.DEBUG, "SendRawTransactionBtc: Share message to esplora")
+                    alternative.run(plugin, request, response)
                 }
             }
-            plugin.log(PluginLog.DEBUG, "SendRawTransactionBtc: Share message to esplora")
-            alternative.run(plugin, request, response)
         }
     }
 }
