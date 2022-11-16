@@ -69,9 +69,9 @@ class GetChainInfoBtc(
             throw exception
         } catch (exception: Exception) {
             when (exception) {
-                /*is BitcoinCoreException -> {
+                is BitcoinCoreException -> {
                     plugin.log(PluginLog.ERROR, "GetChainInfoBtc: terminate bitcoin core with error: %s".format(exception.message))
-                }*/
+                }
                 is LiteBitcoinRPCException -> {
                     plugin.log(PluginLog.ERROR, exception.stackTraceToString())
                 }
