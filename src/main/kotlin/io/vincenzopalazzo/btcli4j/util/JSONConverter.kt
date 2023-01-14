@@ -36,7 +36,9 @@ object JSONConverter {
         gsonBuilder.setPrettyPrinting()
     }
 
-    private val gson = gsonBuilder.create()
+    private val gson = gsonBuilder
+        .serializeNulls()
+        .create()
 
     fun serialize(obj: Any): String? {
         return gson.toJson(obj)
