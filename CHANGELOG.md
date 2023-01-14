@@ -1,3 +1,9 @@
+# v0.0.5
+
+## Fixed
+- upgrade the java library with the upstream ([commit](https://github.com/clightning4j/btcli4j/commit/d04d0a03a54d24fcaedbd1021eba2ce566dffe36)). @vincenzopalazzo 14-01-2023
+
+
 # v0.0.4
 
 ## Fixed
