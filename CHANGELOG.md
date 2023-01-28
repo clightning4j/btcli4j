@@ -1,3 +1,9 @@
+# v0.0.6
+
+## Fixed
+- fix the possibility to disable the cln proxy ([commit](https://github.com/clightning4j/btcli4j/commit/99046cd04609a8a0c9dfcbb56e1a0de57150a9aa)). @vincenzopalazzo 28-01-2023
+
+
 # v0.0.5
 
 ## Fixed

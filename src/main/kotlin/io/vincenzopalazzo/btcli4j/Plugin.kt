@@ -131,7 +131,7 @@ class Plugin : CLightningPlugin() {
         // TODO: The plugin have some proxy enabled and proxy url propriety to give the possibility to the user
         // to specify a custom proxy only of the http client used by the plugin. Implement this view.
         val optionsManager = OptionsManager(endpointUrl, waitingTime, null, !this.proxyDisabled, proxy)
-        if (!pluginInit && configs.isProxyEnabled) {
+        if (!pluginInit && configs.isProxyEnabled && !this.proxyDisabled) {
             val proxyIp = configs.proxy.address
             val proxyPort = configs.proxy.port
             val torVersion = when (configs.proxy.type) {
