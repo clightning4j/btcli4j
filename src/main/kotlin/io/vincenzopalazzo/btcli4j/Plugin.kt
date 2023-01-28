@@ -60,12 +60,12 @@ class Plugin : CLightningPlugin() {
     private var proxy: String = "127.0.0.1:9050"
 
     @PluginOption(
-        name = "btcli4j-proxy-enable",
-        description = "This option give enable the proxy inside plugin. By default is true",
-        defValue = "true",
+        name = "btcli4j-proxy-disabled",
+        description = "This option give disable the proxy inside plugin. By default is false and use the cln settings",
+        defValue = "false",
         typeValue = "flag"
     )
-    private var proxyEnable: Boolean = true
+    private var proxyDisabled: Boolean = false
 
     @PluginOption(
         name = "bitcoin-rpcpassword",
@@ -130,7 +130,7 @@ class Plugin : CLightningPlugin() {
     private fun configurePluginInit() {
         // TODO: The plugin have some proxy enabled and proxy url propriety to give the possibility to the user
         // to specify a custom proxy only of the http client used by the plugin. Implement this view.
-        val optionsManager = OptionsManager(endpointUrl, waitingTime, null, proxyEnable, proxy)
+        val optionsManager = OptionsManager(endpointUrl, waitingTime, null, !this.proxyDisabled, proxy)
         if (!pluginInit && configs.isProxyEnabled) {
             val proxyIp = configs.proxy.address
             val proxyPort = configs.proxy.port
