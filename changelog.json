@@ -1,6 +1,6 @@
 {
   "package_name": "btcli4j",
-  "version": "v0.0.5",
+  "version": "v0.0.6",
   "api": {
     "name": "github",
     "repository": "clightning4j/btcli4j",
