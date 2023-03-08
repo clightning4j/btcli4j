@@ -1,0 +1,8 @@
+---
+plugin:
+  name: btcli4j
+  version: 0.0.1
+  lang: java
+  install: |
+    ./gradlew createRunnableScript
+  main: btcli4j-gen.sh
