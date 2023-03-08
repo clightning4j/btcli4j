@@ -4,5 +4,5 @@ plugin:
   version: 0.0.1
   lang: java
   install: |
-    ./gradlew createRunnableScript
+    exec gradlew createRunnableScript
   main: btcli4j-gen.sh
