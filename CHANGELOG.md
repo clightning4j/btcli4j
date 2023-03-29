@@ -1,3 +1,14 @@
+# v0.0.7
+
+## Fixed
+- fix the estimation of the fee in pruning mode ([commit](https://github.com/clightning4j/btcli4j/commit/76d9823120cba399591766120a569bbb63551a15)). @vincenzopalazzo 29-03-2023
+- coffe script ([commit](https://github.com/clightning4j/btcli4j/commit/de360fa8e24e31e693c8636a32eac7ce07e9cea8)). @vincenzopalazzo 08-03-2023
+- coffe script ([commit](https://github.com/clightning4j/btcli4j/commit/c233640b005600dd4f9b41c9b49a81b8e1733a9c)). @vincenzopalazzo 08-03-2023
+
+## Added
+- support coffee manifest ([commit](https://github.com/clightning4j/btcli4j/commit/e006d838477b149d650c36eb1e065cc40813bd77)). @vincenzopalazzo 08-03-2023
+
+
 # v0.0.6
 
 ## Fixed
